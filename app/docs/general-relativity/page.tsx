@@ -3,6 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DisplayMath, InlineMath } from "@/components/ui/math";
+import SpacetimeCurvature from "@/components/interactive/SpacetimeCurvature";
 
 export default function GeneralRelativityPage() {
   return (
@@ -192,18 +193,21 @@ v_modified = np.sqrt(radii * a_modified)
               </CardHeader>
               <CardContent className="text-white/80">
                 <p className="mb-4">
-                  This section would feature an interactive Three.js visualization showing 
-                  how mass curves spacetime in both standard GR and in modified gravity theories.
+                  This interactive visualization shows how mass curves spacetime in both 
+                  standard General Relativity and in modified gravity theories. Use the 
+                  controls to adjust the mass and switch between theories.
                 </p>
-                <div className="bg-zinc-900/50 p-4 rounded-md text-center h-60 flex items-center justify-center">
-                  <p className="text-dark-pink">
-                    [Interactive Spacetime Curvature Visualization]
-                  </p>
+                <div className="bg-zinc-900/50 p-4 rounded-md">
+                  <SpacetimeCurvature />
                 </div>
                 <p className="mt-4">
-                  The simulation above demonstrates how mass curves spacetime, and how this 
+                  The simulation demonstrates how mass curves spacetime, and how this 
                   curvature affects the motion of objects. In modified gravity theories, this 
                   curvature is enhanced at certain scales without additional dark matter.
+                </p>
+                <p className="mt-2 text-sm text-white/60">
+                  Note: Drag to rotate the view, scroll to zoom, and use the controls below the visualization
+                  to modify parameters.
                 </p>
               </CardContent>
             </Card>

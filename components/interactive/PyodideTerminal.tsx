@@ -78,7 +78,7 @@ print(f"Ratio of velocities: {v_total[33]/v_newton[33]:.2f}x")
 # Convert to kpc for plotting
 r_kpc = r_values / 3.086e19
 
-# Create plot data
+# Create plot data - use Python lists instead of numpy arrays
 trace1 = {
     'x': r_kpc.tolist(),
     'y': v_newton.tolist(),
@@ -120,11 +120,15 @@ layout = {
 
 print("Calculations complete!")
 
-# Create the figure and store for visualization
-figure = {'data': [trace1, trace2], 'layout': layout}
-plotly_data = figure  # Store as Python object, will be auto-converted
+# Create the figure in the expected format for Plotly React component
+# This must have 'data' and 'layout' properties
+plotly_data = {
+    'data': [trace1, trace2],
+    'layout': layout
+}
 
-print("Plot data generated successfully")`;
+print("Plot data generated successfully")
+print(f"plotly_data is a {type(plotly_data).__name__} with {len(plotly_data['data'])} traces")`;
 
 interface PyodideTerminalProps {
   initialCode?: string;
@@ -221,6 +225,14 @@ export function PyodideTerminal({
     }
   }, [plotlyModule]);
 
+  // Debug logging
+  useEffect(() => {
+    if (output) {
+      console.log("Output state updated, length:", output.length);
+      console.log("Output preview:", output.substring(0, 100));
+    }
+  }, [output]);
+
   const runCode = async () => {
     if (!pyodideRef.current) {
       setOutput('Python environment not ready yet. Please wait...');
@@ -232,105 +244,159 @@ export function PyodideTerminal({
     setActiveTab('output');
     
     try {
-      // Execute the code with a much simpler approach
-      const simpleCode = `
+      // Set up a direct JavaScript output capture using function override
+      const outputLines: string[] = [];
+      
+      // Define a JavaScript function to capture Python prints
+      // @ts-ignore - window augmentation
+      window.captureOutput = (text: string) => {
+        console.log("Captured output:", text);
+        outputLines.push(text);
+      };
+      
+      // Register the JavaScript function to Python
+      pyodideRef.current.registerJsModule('js_output', {
+        capture: (text: string) => {
+          console.log("JS module captured:", text);
+          outputLines.push(text);
+        }
+      });
+      
+      // Set up the Python environment with a custom print function
+      await pyodideRef.current.runPythonAsync(`
 import sys
-import io
-import json
-import traceback
+from js import captureOutput
+from js_output import capture
 
-# Create a function to execute the user code safely
-def run_user_code():
-    # Store original stdout
-    original_stdout = sys.stdout
+# Store the original print function
+original_print = print
+
+# Define a new print function that captures output
+def custom_print(*args, **kwargs):
+    # First call the original print so it shows in the console
+    original_print(*args, **kwargs)
     
-    # Create a string buffer for output
-    stdout_buffer = io.StringIO()
+    # Convert all arguments to strings and join
+    out = " ".join(str(arg) for arg in args)
     
-    # Redirect stdout to our buffer
-    sys.stdout = stdout_buffer
-    
+    # Capture the output via JavaScript
     try:
-        # Execute the user code directly
-${code.split('\n').map(line => '        ' + line).join('\n')}
-        
-        # Get information about plot data
-        has_plot = 'plotly_data' in globals()
-        plot_data = globals().get('plotly_data', None) if has_plot else None
-        return {
-            "success": True,
-            "output": stdout_buffer.getvalue(),
-            "has_plot": has_plot,
-            "plot_data": plot_data,
-            "error": None
-        }
+        captureOutput(out)
     except Exception as e:
-        return {
-            "success": False,
-            "output": stdout_buffer.getvalue(),
-            "has_plot": False,
-            "plot_data": None,
-            "error": str(e),
-            "traceback": traceback.format_exc()
-        }
-    finally:
-        # Reset stdout
-        sys.stdout = original_stdout
-        # Close buffer
-        stdout_buffer.close()
+        original_print(f"Error capturing output: {e}")
+        try:
+            capture(out)
+        except Exception as e2:
+            original_print(f"Both capture methods failed: {e2}")
 
-# Run the code and return the result
-result = run_user_code()
-result
-`;
-
-      // Run the code
-      const result = await pyodideRef.current.runPythonAsync(simpleCode);
+# Replace the built-in print function
+print = custom_print
+`);
       
-      console.log("Python execution result:", result);
+      console.log("Print function redefined");
       
-      // Process the result
-      let outputText = '';
-      
-      if (result && typeof result === 'object') {
-        // Handle the output
-        if (result.output && result.output.length > 0) {
-          outputText = result.output;
-        }
+      // Execute the user code directly, without any stdout redirection
+      try {
+        // First run the code
+        const result = await pyodideRef.current.runPythonAsync(code);
+        console.log("Code execution result:", result);
         
-        // Handle any error
-        if (!result.success && result.error) {
-          outputText += `\n\nError: ${result.error}\n`;
-          if (result.traceback) {
-            outputText += `\n${result.traceback}`;
-          }
-        }
+        // Check for plotly_data in Python's global scope
+        const hasPlotData = await pyodideRef.current.runPythonAsync(`'plotly_data' in globals()`);
         
-        // Handle plot data
-        if (result.has_plot && result.plot_data) {
+        if (hasPlotData) {
           try {
-            setPlotData(result.plot_data);
-            // If we have output, show that first, then switch to visualization after a delay
-            if (outputText) {
-              setTimeout(() => setActiveTab('visualization'), 1500);
+            console.log("plotly_data found in globals");
+            // Get the plotly_data and check its type
+            const dataType = await pyodideRef.current.runPythonAsync(`type(plotly_data).__name__`);
+            console.log("plotly_data type:", dataType);
+            
+            // Get the data in the appropriate format
+            let plotData;
+            if (dataType === 'dict' || dataType === 'list') {
+              // If it's a Python dict or list, convert to JSON string first
+              const jsonString = await pyodideRef.current.runPythonAsync(`
+import json
+json.dumps(plotly_data)
+              `);
+              console.log("JSON string length:", jsonString.length);
+              plotData = JSON.parse(jsonString);
+            } else if (dataType === 'str') {
+              // If it's already a string, try to parse it as JSON
+              const jsonString = await pyodideRef.current.runPythonAsync(`plotly_data`);
+              plotData = JSON.parse(jsonString);
             } else {
-              setActiveTab('visualization');
+              // Try direct access but this might fail for complex objects
+              plotData = await pyodideRef.current.runPythonAsync(`plotly_data`);
             }
-          } catch (e: any) {
-            console.error('Failed to handle plot data:', e);
-            outputText += `\n\nVisualization Error: ${e.message}`;
+            
+            console.log("Plot data processed:", plotData ? "success" : "failed");
+            
+            if (plotData) {
+              // Explicitly check the structure we need for the Plot component
+              if (!plotData.data || !plotData.layout) {
+                console.log("Plot data missing required properties, structure:", Object.keys(plotData));
+                // Try to fix common issues
+                if (Array.isArray(plotData) && plotData.length > 0) {
+                  // If it's just an array of traces, create the full structure
+                  setPlotData({
+                    data: plotData,
+                    layout: {
+                      title: 'Galaxy Rotation Curve',
+                      xaxis: {
+                        title: 'Radius (kpc)',
+                        color: 'white'
+                      },
+                      yaxis: {
+                        title: 'Velocity (m/s)',
+                        color: 'white'
+                      },
+                      plot_bgcolor: 'rgba(0, 0, 0, 0)',
+                      paper_bgcolor: 'rgba(0, 0, 0, 0)',
+                      font: {
+                        color: 'white'
+                      }
+                    }
+                  });
+                }
+              } else {
+                // The data is already in the correct format
+                setPlotData(plotData);
+              }
+              
+              // Always switch to visualization tab if we have plot data
+              setTimeout(() => setActiveTab('visualization'), 1500);
+            }
+          } catch (e) {
+            console.error("Error processing plotly_data:", e);
           }
         }
-      }
-      
-      if (outputText.trim() === '') {
-        setOutput('No output was produced. Try adding some print statements to your code.');
-      } else {
-        setOutput(outputText);
+        
+        // Join the captured output lines
+        const capturedOutput = outputLines.join('\n');
+        console.log("Total captured lines:", outputLines.length);
+        
+        if (capturedOutput.trim() !== '') {
+          setOutput(capturedOutput);
+        } else {
+          // Try one more direct print
+          await pyodideRef.current.runPythonAsync(`
+print("Direct test from final verification")
+`);
+          
+          if (outputLines.length > 0) {
+            setOutput(outputLines.join('\n'));
+          } else {
+            setOutput('No output was produced. Try adding some print statements to your code.');
+          }
+        }
+      } catch (error) {
+        console.error("Error executing user code:", error);
+        setOutput(`Error executing code: ${error instanceof Error ? error.message : String(error)}`);
       }
     } catch (error) {
-      console.error('Error running Python code:', error);
-      setOutput(`Error: ${error instanceof Error ? error.message : String(error)}`);
+      console.error('Error setting up Python environment:', error);
+      setOutput(`Setup error: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsLoading(false);
     }
@@ -378,7 +444,7 @@ result
                   Code View
                 </TabsTrigger>
                 <TabsTrigger value="output" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">
-                  Console Output
+                  Console Output {output && output.length > 0 && <span className="ml-1 text-xs">({output.length} chars)</span>}
                 </TabsTrigger>
                 <TabsTrigger value="visualization" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">
                   Visualization
@@ -407,11 +473,14 @@ result
                   {plotData ? (
                     <div className="w-full h-96">
                       <Plot
-                        data={plotData.data}
+                        data={plotData.data || []}
                         layout={{
-                          ...plotData.layout,
+                          ...(plotData.layout || {}),
                           autosize: true,
                           height: 380,
+                          plot_bgcolor: 'rgba(0, 0, 0, 0)',
+                          paper_bgcolor: 'rgba(0, 0, 0, 0)',
+                          font: { color: 'white' }
                         }}
                         useResizeHandler={true}
                         style={{ width: '100%', height: '100%' }}

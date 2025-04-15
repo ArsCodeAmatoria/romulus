@@ -93,6 +93,16 @@ export default function Navigation() {
                 Documentation
               </Link>
             </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <Link 
+                href="/interactive-demo" 
+                className={`${pathname === '/interactive-demo' ? 'text-dark-pink' : 'text-white'} flex items-center`}
+              >
+                <span className="mr-2">Interactive</span>
+                <span className="px-1.5 py-0.5 text-xs bg-dark-pink/20 rounded text-dark-pink">New</span>
+              </Link>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
         

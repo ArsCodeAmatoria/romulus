@@ -7,13 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import dynamic from 'next/dynamic';
 import { LoadingSpinner } from './LoadingSpinner';
+import * as PlotlyJS from 'plotly.js';
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
 
 // Default Python code for the Emergent Gravity model
 const DEFAULT_CODE = `import numpy as np
-from js import Plotly, document
+import json
 
 # Constants
 G = 6.67e-11  # Gravitational constant
@@ -107,7 +108,6 @@ layout = {
 figure = {'data': [trace1, trace2], 'layout': layout}
 
 # Convert to JSON for Plotly
-import json
 plotly_data = json.dumps(figure)
 
 # Return the plot data to be rendered by React
@@ -122,6 +122,7 @@ interface PyodideType {
   globals: {
     get: (key: string) => any;
   };
+  registerJsModule: (name: string, module: any) => void;
 }
 
 export function PyodideTerminal({
@@ -152,11 +153,14 @@ export function PyodideTerminal({
         });
         
         pyodideRef.current = pyodide;
-        setPyodideReady(true);
+        
+        // Register Plotly as a JavaScript module that can be imported from Python
+        pyodide.registerJsModule('plotly', PlotlyJS);
         
         // Pre-install numpy
         await pyodide.loadPackagesFromImports('import numpy as np');
         
+        setPyodideReady(true);
         console.log('Pyodide loaded successfully');
       } catch (error) {
         console.error('Error initializing Pyodide:', error);
@@ -176,7 +180,9 @@ export function PyodideTerminal({
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
@@ -219,6 +225,7 @@ export function PyodideTerminal({
         try {
           const plotJson = JSON.parse(result);
           setPlotData(plotJson);
+          setActiveTab('visualization');
         } catch (e) {
           console.error('Failed to parse plot data:', e);
         }
@@ -284,7 +291,7 @@ export function PyodideTerminal({
                 <div className="bg-zinc-900/50 p-4 rounded-md">
                   <h3 className="text-lg font-medium text-dark-pink mb-2">Code Explanation</h3>
                   <p className="text-white/80">
-                    This code calculates how galaxies rotate under standard Newtonian gravity (blue) 
+                    This code calculates how galaxies rotate under standard Newtonian gravity (white) 
                     and under Erik Verlinde's Emergent Gravity theory (pink). Modify the mass, 
                     radii, or <code>a0</code> parameter to see how they affect the predicted rotation curves.
                   </p>
@@ -292,7 +299,7 @@ export function PyodideTerminal({
               </TabsContent>
 
               <TabsContent value="output" className="mt-4">
-                <div className="bg-zinc-900/50 p-4 rounded-md h-48 overflow-auto font-mono text-sm">
+                <div className="bg-zinc-900/50 p-4 rounded-md h-48 overflow-auto font-mono text-sm text-white/80">
                   {output || 'Run the code to see output here.'}
                 </div>
               </TabsContent>

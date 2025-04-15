@@ -3,7 +3,7 @@
 A modern, futuristic science site focused on exploring Dark Matter through Modified Gravity theories.
 
 <div align="center">
-  <img src="https://i.imgur.com/UYgZpLO.jpg" alt="Romulus Concept Art" width="600" />
+  <img src="public/images/romulus-pilot.png" alt="Romulus Concept Art" width="600" />
 </div>
 
 ## Overview

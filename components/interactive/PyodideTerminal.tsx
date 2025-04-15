@@ -6,15 +6,23 @@ import CodeEditor from './CodeEditor';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import dynamic from 'next/dynamic';
-import { LoadingSpinner } from './LoadingSpinner';
-import * as PlotlyJS from 'plotly.js';
+import { LoadingSpinner } from '@/components/interactive/LoadingSpinner';
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
 
+// Use dynamic import for PlotlyJS as well
+const PlotlyJS = dynamic(() => import('plotly.js'), { 
+  ssr: false,
+  loading: () => null 
+});
+
 // Default Python code for the Emergent Gravity model
 const DEFAULT_CODE = `import numpy as np
 import json
+
+# Print some info for testing console output
+print("Starting gravity calculations...")
 
 # Constants
 G = 6.67e-11  # Gravitational constant
@@ -49,6 +57,7 @@ def emergent_gravity_acceleration(r, M, a0=1.2e-10):
 
 # Galaxy parameters
 M_galaxy = 1e10 * 2e30  # Galaxy mass (10 billion solar masses in kg)
+print(f"Galaxy mass: {M_galaxy/2e30:.2e} solar masses")
 
 # Radii from 1 to 30 kpc
 r_values = np.linspace(1, 30, 100) * 3.086e19  # kpc to meters
@@ -60,6 +69,11 @@ a_total = emergent_gravity_acceleration(r_values, M_galaxy)
 # Convert to velocities
 v_newton = np.sqrt(r_values * a_newton)
 v_total = np.sqrt(r_values * a_total)
+
+# Report some metrics for comparison
+print(f"Velocity at 10 kpc (Newtonian): {v_newton[33]:.2f} m/s")
+print(f"Velocity at 10 kpc (Emergent): {v_total[33]:.2f} m/s")
+print(f"Ratio of velocities: {v_total[33]/v_newton[33]:.2f}x")
 
 # Convert to kpc for plotting
 r_kpc = r_values / 3.086e19
@@ -104,14 +118,13 @@ layout = {
     }
 }
 
-# Create the figure
+print("Calculations complete!")
+
+# Create the figure and store for visualization
 figure = {'data': [trace1, trace2], 'layout': layout}
+plotly_data = figure  # Store as Python object, will be auto-converted
 
-# Convert to JSON for Plotly
-plotly_data = json.dumps(figure)
-
-# Return the plot data to be rendered by React
-plotly_data`;
+print("Plot data generated successfully")`;
 
 interface PyodideTerminalProps {
   initialCode?: string;
@@ -123,6 +136,8 @@ interface PyodideType {
     get: (key: string) => any;
   };
   registerJsModule: (name: string, module: any) => void;
+  setStdout: (options: { write: (text: string) => void }) => void;
+  setStderr: (options: { write: (text: string) => void }) => void;
 }
 
 export function PyodideTerminal({
@@ -135,6 +150,7 @@ export function PyodideTerminal({
   const [pyodideReady, setPyodideReady] = useState(false);
   const [plotData, setPlotData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>('code');
+  const [plotlyModule, setPlotlyModule] = useState<any>(null);
 
   const pyodideRef = useRef<PyodideType | null>(null);
 
@@ -143,48 +159,67 @@ export function PyodideTerminal({
     async function initPyodide() {
       try {
         setPyodideLoading(true);
-        
-        // For development mode, we'll log to console
         console.log('Loading pyodide...');
         
+        // Load Pyodide without stdout/stderr initially
         // @ts-ignore
         const pyodide = await window.loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/",
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"
         });
         
         pyodideRef.current = pyodide;
         
-        // Register Plotly as a JavaScript module that can be imported from Python
-        pyodide.registerJsModule('plotly', PlotlyJS);
-        
-        // Pre-install numpy
+        // Load numpy first
         await pyodide.loadPackagesFromImports('import numpy as np');
+        console.log('NumPy loaded successfully');
+        
+        // Only register Plotly module after it's loaded on the client side
+        if (typeof PlotlyJS !== 'function') {
+          // If PlotlyJS is a dynamic import (function), wait for it to resolve
+          const plotlyImport = await PlotlyJS;
+          setPlotlyModule(plotlyImport);
+          if (plotlyImport) {
+            pyodide.registerJsModule('plotly', plotlyImport);
+            console.log('Plotly registered with Pyodide');
+          }
+        }
         
         setPyodideReady(true);
         console.log('Pyodide loaded successfully');
       } catch (error) {
         console.error('Error initializing Pyodide:', error);
-        setOutput('Error initializing Python environment. Please try again later.');
+        setOutput(`Error initializing Python environment: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setPyodideLoading(false);
       }
     }
 
-    // Load Pyodide script
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
-    script.async = true;
-    script.onload = () => {
-      initPyodide();
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    // Only run in browser
+    if (typeof window !== 'undefined') {
+      // Load Pyodide script
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+      script.async = true;
+      script.onload = () => {
+        initPyodide();
+      };
+      document.body.appendChild(script);
+  
+      return () => {
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+      };
+    }
   }, []);
+
+  // Register Plotly module when plotlyModule changes
+  useEffect(() => {
+    if (pyodideRef.current && plotlyModule) {
+      pyodideRef.current.registerJsModule('plotly', plotlyModule);
+      console.log('Plotly registered with Pyodide after dynamic import');
+    }
+  }, [plotlyModule]);
 
   const runCode = async () => {
     if (!pyodideRef.current) {
@@ -195,40 +230,103 @@ export function PyodideTerminal({
     setIsLoading(true);
     setOutput('');
     setActiveTab('output');
-
+    
     try {
-      // Capture stdout and stderr
-      const stdout: string[] = [];
-      const stderr: string[] = [];
-      
-      // @ts-ignore
-      pyodideRef.current.setStdout({ write: (text) => stdout.push(text) });
-      // @ts-ignore
-      pyodideRef.current.setStderr({ write: (text) => stderr.push(text) });
+      // Execute the code with a much simpler approach
+      const simpleCode = `
+import sys
+import io
+import json
+import traceback
+
+# Create a function to execute the user code safely
+def run_user_code():
+    # Store original stdout
+    original_stdout = sys.stdout
+    
+    # Create a string buffer for output
+    stdout_buffer = io.StringIO()
+    
+    # Redirect stdout to our buffer
+    sys.stdout = stdout_buffer
+    
+    try:
+        # Execute the user code directly
+${code.split('\n').map(line => '        ' + line).join('\n')}
+        
+        # Get information about plot data
+        has_plot = 'plotly_data' in globals()
+        plot_data = globals().get('plotly_data', None) if has_plot else None
+        return {
+            "success": True,
+            "output": stdout_buffer.getvalue(),
+            "has_plot": has_plot,
+            "plot_data": plot_data,
+            "error": None
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "output": stdout_buffer.getvalue(),
+            "has_plot": False,
+            "plot_data": None,
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+    finally:
+        # Reset stdout
+        sys.stdout = original_stdout
+        # Close buffer
+        stdout_buffer.close()
+
+# Run the code and return the result
+result = run_user_code()
+result
+`;
 
       // Run the code
-      const result = await pyodideRef.current.runPythonAsync(code);
-
-      // Format output
+      const result = await pyodideRef.current.runPythonAsync(simpleCode);
+      
+      console.log("Python execution result:", result);
+      
+      // Process the result
       let outputText = '';
-      if (stdout.length > 0) {
-        outputText += stdout.join('');
-      }
-      if (stderr.length > 0) {
-        outputText += '\nErrors:\n' + stderr.join('');
+      
+      if (result && typeof result === 'object') {
+        // Handle the output
+        if (result.output && result.output.length > 0) {
+          outputText = result.output;
+        }
+        
+        // Handle any error
+        if (!result.success && result.error) {
+          outputText += `\n\nError: ${result.error}\n`;
+          if (result.traceback) {
+            outputText += `\n${result.traceback}`;
+          }
+        }
+        
+        // Handle plot data
+        if (result.has_plot && result.plot_data) {
+          try {
+            setPlotData(result.plot_data);
+            // If we have output, show that first, then switch to visualization after a delay
+            if (outputText) {
+              setTimeout(() => setActiveTab('visualization'), 1500);
+            } else {
+              setActiveTab('visualization');
+            }
+          } catch (e: any) {
+            console.error('Failed to handle plot data:', e);
+            outputText += `\n\nVisualization Error: ${e.message}`;
+          }
+        }
       }
       
-      setOutput(outputText);
-
-      // Check if the result is a plot data JSON
-      if (result && typeof result === 'string' && result.includes('"data"') && result.includes('"layout"')) {
-        try {
-          const plotJson = JSON.parse(result);
-          setPlotData(plotJson);
-          setActiveTab('visualization');
-        } catch (e) {
-          console.error('Failed to parse plot data:', e);
-        }
+      if (outputText.trim() === '') {
+        setOutput('No output was produced. Try adding some print statements to your code.');
+      } else {
+        setOutput(outputText);
       }
     } catch (error) {
       console.error('Error running Python code:', error);
@@ -299,7 +397,7 @@ export function PyodideTerminal({
               </TabsContent>
 
               <TabsContent value="output" className="mt-4">
-                <div className="bg-zinc-900/50 p-4 rounded-md h-48 overflow-auto font-mono text-sm text-white/80">
+                <div className="bg-zinc-900/50 p-4 rounded-md h-48 overflow-auto font-mono text-sm text-white/80 whitespace-pre-wrap">
                   {output || 'Run the code to see output here.'}
                 </div>
               </TabsContent>

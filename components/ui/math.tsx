@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, createElement } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 
@@ -11,18 +11,26 @@ interface MathProps {
 }
 
 export function Math({ math, display = false, className = '' }: MathProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
+  // Use separate refs for div and span elements
+  const divRef = useRef<HTMLDivElement>(null);
+  const spanRef = useRef<HTMLSpanElement>(null);
+  
   useEffect(() => {
-    if (containerRef.current) {
-      katex.render(math, containerRef.current, {
+    const container = display ? divRef.current : spanRef.current;
+    if (container) {
+      katex.render(math, container, {
         displayMode: display,
         throwOnError: false,
       });
     }
   }, [math, display]);
 
-  return <div ref={containerRef} className={className} />;
+  // Render the appropriate element based on display mode
+  if (display) {
+    return <div ref={divRef} className={className} />;
+  } else {
+    return <span ref={spanRef} className={className} />;
+  }
 }
 
 export function InlineMath({ math, className = '' }: Omit<MathProps, 'display'>) {

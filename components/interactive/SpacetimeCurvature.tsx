@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sphere, Grid, Text } from '@react-three/drei';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+import Slider from '@/components/ui/slider';
 import { Group } from 'three';
 
 // Helper component for grid points

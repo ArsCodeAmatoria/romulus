@@ -2,7 +2,9 @@
 
 A modern, futuristic science site focused on exploring Dark Matter through Modified Gravity theories.
 
-![Romulus](public/romulus-preview.jpg)
+<div align="center">
+  <img src="https://i.imgur.com/UYgZpLO.jpg" alt="Romulus Concept Art" width="600" />
+</div>
 
 ## Overview
 
@@ -18,7 +20,7 @@ This approach could explain why direct detection experiments have consistently f
 
 - **Interactive 3D Visualizations**: Space-time curvature demonstrations using Three.js and React Three Fiber
 - **Theory Explorer**: Documentation hub for various modified gravity approaches
-- **Mathematical Explanations**: Complex equations rendered with unicode math characters
+- **Mathematical Explanations**: Complex equations rendered with KaTeX
 - **Code Examples**: Sample implementations of modified gravity calculations
 - **Modern Dark UI**: Sleek black background with pink neon accents
 
@@ -38,6 +40,7 @@ This approach could explain why direct detection experiments have consistently f
 - shadcn/ui components
 - Three.js with @react-three/fiber and @react-three/drei
 - Framer Motion for animations
+- KaTeX for LaTeX math rendering
 
 ## Getting Started
 

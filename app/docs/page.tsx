@@ -3,37 +3,44 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import { 
+  Globe2, 
+  Orbit, 
+  Rocket, 
+  Atom, 
+  Sparkles 
+} from 'lucide-react';
 
 const theories = [
   {
     title: "General Relativity + Effective Tensor Modifications",
     description: "Einstein's General Relativity and tensor-based modifications to explain dark matter effects",
     link: "/docs/general-relativity",
-    icon: "🌌"
+    icon: <Globe2 className="text-dark-pink" size={28} />
   },
   {
     title: "Emergent Gravity (Verlinde)",
     description: "Gravity as an emergent phenomenon arising from quantum entanglement",
     link: "/docs/emergent-gravity",
-    icon: "🌐"
+    icon: <Orbit className="text-dark-pink" size={28} />
   },
   {
     title: "MOND and TeVeS",
     description: "Modified Newtonian Dynamics and its relativistic extension, Tensor-Vector-Scalar gravity",
     link: "/docs/mond",
-    icon: "🚀"
+    icon: <Rocket className="text-dark-pink" size={28} />
   },
   {
     title: "Scalar Field / f(R) Gravity",
     description: "Modified gravity theories involving scalar fields and f(R) extensions",
     link: "/docs/scalar-field",
-    icon: "⚛️"
+    icon: <Atom className="text-dark-pink" size={28} />
   },
   {
     title: "Quantum Gravity + Holographic Principle",
     description: "Approaches to gravity from quantum mechanics and the holographic principle",
     link: "/docs/quantum-gravity",
-    icon: "🔮"
+    icon: <Sparkles className="text-dark-pink" size={28} />
   }
 ];
 
@@ -75,7 +82,7 @@ export default function DocsPage() {
               <Link href={theory.link} className="block h-full">
                 <Card className="bg-black border-dark-pink/20 hover:border-dark-pink transition-colors h-full neon-border">
                   <CardHeader>
-                    <div className="text-3xl mb-2">{theory.icon}</div>
+                    <div className="mb-2">{theory.icon}</div>
                     <CardTitle className="text-white">{theory.title}</CardTitle>
                   </CardHeader>
                   <CardContent>

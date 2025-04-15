@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DisplayMath, InlineMath } from "@/components/ui/math";
 
 export default function GeneralRelativityPage() {
   return (
@@ -40,13 +41,13 @@ export default function GeneralRelativityPage() {
                   spacetime, and this curvature guides the motion of other objects. This is captured 
                   mathematically by the Einstein field equations:
                 </p>
-                <div className="my-4 bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                  G_μν + Λg_μν = (8πG/c⁴)T_μν
+                <div className="my-4 bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                  <DisplayMath math="G_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4}T_{\mu\nu}" />
                 </div>
                 <p>
-                  Where G_μν is the Einstein tensor, Λ is the cosmological 
-                  constant, g_μν is the metric tensor, G is Newton's gravitational 
-                  constant, c is the speed of light, and T_μν is the 
+                  Where <InlineMath math="G_{\mu\nu}" /> is the Einstein tensor, <InlineMath math="\Lambda" /> is the cosmological 
+                  constant, <InlineMath math="g_{\mu\nu}" /> is the metric tensor, <InlineMath math="G" /> is Newton's gravitational 
+                  constant, <InlineMath math="c" /> is the speed of light, and <InlineMath math="T_{\mu\nu}" /> is the 
                   stress-energy tensor.
                 </p>
               </CardContent>
@@ -65,29 +66,29 @@ export default function GeneralRelativityPage() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Einstein Field Equations</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                      R_μν - (1/2)Rg_μν + Λg_μν = (8πG/c⁴)T_μν
+                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                      <DisplayMath math="R_{\mu\nu} - \frac{1}{2}R g_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4}T_{\mu\nu}" />
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Einstein Tensor</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                      G_μν = R_μν - (1/2)Rg_μν
+                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                      <DisplayMath math="G_{\mu\nu} = R_{\mu\nu} - \frac{1}{2}R g_{\mu\nu}" />
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Ricci Tensor</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                      R_μν = ∂_λΓ^λ_μν - ∂_νΓ^λ_μλ + Γ^λ_μνΓ^σ_λσ - Γ^σ_μλΓ^λ_νσ
+                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                      <DisplayMath math="R_{\mu\nu} = \partial_{\lambda}\Gamma^{\lambda}_{\mu\nu} - \partial_{\nu}\Gamma^{\lambda}_{\mu\lambda} + \Gamma^{\lambda}_{\mu\nu}\Gamma^{\sigma}_{\lambda\sigma} - \Gamma^{\sigma}_{\mu\lambda}\Gamma^{\lambda}_{\nu\sigma}" />
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Geodesic Equation</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                      d²x^μ/dτ² + Γ^μ_αβ(dx^α/dτ)(dx^β/dτ) = 0
+                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                      <DisplayMath math="\frac{d^2x^{\mu}}{d\tau^2} + \Gamma^{\mu}_{\alpha\beta}\frac{dx^{\alpha}}{d\tau}\frac{dx^{\beta}}{d\tau} = 0" />
                     </div>
                   </div>
                 </div>
@@ -113,11 +114,11 @@ export default function GeneralRelativityPage() {
                 
                 <div>
                   <h3 className="text-lg font-medium text-dark-pink mb-2">Modified Einstein Equations</h3>
-                  <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                    G_μν + Λg_μν + E_μν = (8πG/c⁴)T_μν
+                  <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                    <DisplayMath math="G_{\mu\nu} + \Lambda g_{\mu\nu} + E_{\mu\nu} = \frac{8\pi G}{c^4}T_{\mu\nu}" />
                   </div>
                   <p className="mt-2">
-                    Where E_μν represents additional tensor terms that modify gravity at galactic scales.
+                    Where <InlineMath math="E_{\mu\nu}" /> represents additional tensor terms that modify gravity at galactic scales.
                   </p>
                 </div>
                 

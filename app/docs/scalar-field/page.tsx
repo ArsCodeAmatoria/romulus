@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DisplayMath, InlineMath } from "@/components/ui/math";
 
 export default function ScalarFieldPage() {
   return (
@@ -108,11 +109,11 @@ export default function ScalarFieldPage() {
                 <div className="space-y-6 mt-4">
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">f(R) Gravity</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                      G_μν + f(R)g_μν = (8πG/c⁴)T_μν
+                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                      <DisplayMath math="G_{\mu\nu} + f(R)g_{\mu\nu} = \frac{8\pi G}{c^4}T_{\mu\nu}" />
                     </div>
                     <p className="mt-2">
-                      By modifying how spacetime curvature R behaves through the function f(R), we can naturally
+                      By modifying how spacetime curvature <InlineMath math="R" /> behaves through the function <InlineMath math="f(R)" />, we can naturally
                       generate effects similar to dark matter without additional mass. This affects how gravity
                       behaves at large distances or in regions of low acceleration.
                     </p>
@@ -120,11 +121,11 @@ export default function ScalarFieldPage() {
                   
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Scalar-Tensor Theory</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                      G_μν + φ(x)g_μν = (8πG/c⁴)T_μν
+                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                      <DisplayMath math="G_{\mu\nu} + \phi(x)g_{\mu\nu} = \frac{8\pi G}{c^4}T_{\mu\nu}" />
                     </div>
                     <p className="mt-2">
-                      A scalar field φ(x) modifies the gravitational interaction, creating enhanced gravitational
+                      A scalar field <InlineMath math="\phi(x)" /> modifies the gravitational interaction, creating enhanced gravitational
                       effects at galaxy edges that mimic dark matter halos. The field isn't a particle but rather
                       a property of spacetime that varies with position.
                     </p>
@@ -132,12 +133,12 @@ export default function ScalarFieldPage() {
                   
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Edge Detection Model</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto font-mono text-center">
-                      ∇²ψ = f(ρ)
+                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center">
+                      <DisplayMath math="\nabla^2\psi = f(\rho)" />
                     </div>
                     <p className="mt-2">
                       Similar to edge detection in image processing, this approach treats dark matter as an effect that
-                      emerges around the "edges" of matter distributions. The function f(ρ) selectively enhances gravitational
+                      emerges around the "edges" of matter distributions. The function <InlineMath math="f(\rho)" /> selectively enhances gravitational
                       effects at the boundaries of matter concentrations.
                     </p>
                   </div>

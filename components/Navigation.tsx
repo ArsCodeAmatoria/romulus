@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Github } from 'lucide-react';
 
 import {
   NavigationMenu,
@@ -18,7 +19,7 @@ export default function Navigation() {
   
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-dark-pink/20">
-      <div className="container flex h-16 items-center px-4">
+      <div className="container flex h-16 items-center justify-between px-4">
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
@@ -94,6 +95,16 @@ export default function Navigation() {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
+        
+        <a 
+          href="https://github.com/ArsCodeAmatoria/romulus" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-white hover:text-dark-pink transition-colors"
+          aria-label="View source on GitHub"
+        >
+          <Github size={24} />
+        </a>
       </div>
     </div>
   );

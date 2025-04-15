@@ -1,3 +1,5 @@
+'use client';
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import SpaceScene from "@/components/SpaceScene";
@@ -34,15 +36,15 @@ export default function Home() {
             className="border-dark-pink text-dark-pink hover:bg-dark-pink/20 neon-border"
             asChild
           >
-            <Link href="#about">
+            <Link href="/about">
               Learn More
             </Link>
           </Button>
         </div>
       </main>
       
-      {/* About Section */}
-      <section id="about" className="relative z-10 bg-black/80 backdrop-blur-sm py-16">
+      {/* About Section Preview */}
+      <section id="about-preview" className="relative z-10 bg-black/80 backdrop-blur-sm py-16">
         <div className="container px-4">
           <h2 className="text-3xl font-bold text-white mb-6">About the Project</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

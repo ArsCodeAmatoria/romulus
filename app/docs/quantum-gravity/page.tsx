@@ -3,6 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DisplayMath, InlineMath } from "@/components/ui/math";
+import TensorNetworkVisualization from "@/components/interactive/TensorNetworkVisualization";
 
 export default function QuantumGravityPage() {
   return (
@@ -221,10 +222,8 @@ export default function QuantumGravityPage() {
                   
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Tensor Networks and Spacetime</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md text-center">
-                      <p className="text-dark-pink">
-                        [Tensor Network Visualization Would Appear Here]
-                      </p>
+                    <div className="bg-zinc-900/50 p-4 rounded-md">
+                      <TensorNetworkVisualization />
                     </div>
                     <p className="mt-4">
                       Tensor networks—mathematical structures used to represent highly entangled quantum systems—have been shown 

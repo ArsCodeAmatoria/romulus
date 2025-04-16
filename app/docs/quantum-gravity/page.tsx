@@ -3,6 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DisplayMath, InlineMath } from "@/components/ui/math";
+import TensorNetwork from "@/components/visualization/TensorNetwork";
 
 export default function QuantumGravityPage() {
   return (
@@ -221,15 +222,18 @@ export default function QuantumGravityPage() {
                   
                   <div>
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Tensor Networks and Spacetime</h3>
-                    <div className="bg-zinc-900/50 p-4 rounded-md text-center">
-                      <p className="text-dark-pink">
-                        [Tensor Network Visualization Would Appear Here]
-                      </p>
+                    <div className="bg-zinc-900/50 p-4 rounded-md">
+                      <TensorNetwork />
                     </div>
                     <p className="mt-4">
                       Tensor networks—mathematical structures used to represent highly entangled quantum systems—have been shown 
                       to naturally encode hyperbolic geometry, the same geometry found in Anti-de Sitter space. This suggests that 
                       the mathematical structure of entangled quantum states naturally gives rise to emergent spacetime geometry.
+                    </p>
+                    <p className="mt-2 text-sm text-white/60">
+                      Note: The visualization above shows a tensor network in hyperbolic space. Each node represents a tensor (quantum information), 
+                      and the connections represent entanglement between them. The hyperbolic structure naturally emerges from the pattern of 
+                      quantum entanglement. Drag to rotate and zoom to explore the network.
                     </p>
                   </div>
                 </div>

@@ -18,8 +18,8 @@
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.2.0",
     "@radix-ui/react-tabs": "^1.1.4",
-    "@react-three/drei": "^10.0.6",
-    "@react-three/fiber": "^9.1.2",
+    "@react-three/drei": "9.80.1",
+    "@react-three/fiber": "8.13.6",
     "@uiw/codemirror-theme-vscode": "^4.23.10",
     "@uiw/react-codemirror": "^4.21.22",
     "class-variance-authority": "^0.7.1",
@@ -38,7 +38,7 @@
     "remark-math": "^6.0.0",
     "tailwind-merge": "^3.2.0",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.175.0"
+    "three": "0.154.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

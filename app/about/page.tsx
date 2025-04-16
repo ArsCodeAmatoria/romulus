@@ -82,7 +82,7 @@ export default function AboutPage() {
             </ul>
           </section>
           
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-16 pt-4">
             <Button 
               variant="outline" 
               className="border-dark-pink text-dark-pink hover:bg-dark-pink/20 neon-border"

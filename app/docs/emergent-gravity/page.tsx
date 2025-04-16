@@ -137,55 +137,7 @@ export default function EmergentGravityPage() {
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Computational Implementation</h3>
                     <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
                       <code>
-{`import numpy as np
-import matplotlib.pyplot as plt
-
-def emergent_gravity_acceleration(r, M, a0=1.2e-10):
-    """
-    Calculate acceleration due to emergent gravity effects
-    
-    Parameters:
-    -----------
-    r : float or array
-        Radius from center (meters)
-    M : float
-        Baryonic mass (kg)
-    a0 : float
-        Acceleration scale (m/s²)
-        
-    Returns:
-    --------
-    float or array : Total acceleration
-    """
-    # Newtonian acceleration
-    a_N = G * M / r**2
-    
-    # Emergent gravity contribution
-    # (simplified implementation of Verlinde's equations)
-    a_DM = np.sqrt(a0 * a_N)
-    
-    # Total observed acceleration
-    a_total = a_N + a_DM
-    
-    return a_total
-
-# Example: Calculate for a galaxy
-G = 6.67e-11  # Gravitational constant
-M_galaxy = 1e10 * 2e30  # 10 billion solar masses in kg
-
-# Radii from 1 to 30 kpc
-r_values = np.linspace(1, 30, 100) * 3.086e19  # kpc to meters
-
-# Calculate accelerations
-a_newton = G * M_galaxy / r_values**2
-a_total = emergent_gravity_acceleration(r_values, M_galaxy)
-
-# Convert to velocities
-v_newton = np.sqrt(r_values * a_newton)
-v_total = np.sqrt(r_values * a_total)
-
-# The emergent gravity model predicts flat rotation curves
-# similar to observed galaxy behavior without dark matter`}
+{"module EmergentGravity where\n\nimport Data.List (zip3)\n\n-- | Gravitational constant (m³/kg/s²)\ngravConst :: Double\ngravConst = 6.67e-11\n\n-- | Calculate acceleration due to emergent gravity effects\n-- This implements Verlinde's theory where gravity emerges from\n-- quantum entanglement entropy\nemergentGravityAcceleration :: Double -> Double -> Double -> Double\nemergentGravityAcceleration r mass a0 = aTotal\n  where\n    -- Newtonian acceleration\n    aNewton = gravConst * mass / r^2\n    \n    -- Emergent gravity contribution\n    -- (simplified implementation of Verlinde's equations)\n    aDarkMatter = sqrt (a0 * aNewton)\n    \n    -- Total observed acceleration\n    aTotal = aNewton + aDarkMatter\n\n-- | Calculate rotation curve for a galaxy using emergent gravity\ncalculateRotationCurve :: Double -> Double -> Double -> IO ()\ncalculateRotationCurve mass a0 kpcMax = do\n  -- Constants\n  let kpcToMeters = 3.086e19  -- Conversion from kpc to meters\n  \n  -- Generate radius values from 1 to kpcMax kpc\n  let numPoints = 100\n      kpcValues = [1.0, 1.0 + (kpcMax - 1.0) / (numPoints - 1) .. kpcMax]\n      rValues = map (* kpcToMeters) kpcValues\n  \n  -- Calculate accelerations\n  let aNewtonValues = map (\\r -> gravConst * mass / r^2) rValues\n      aTotalValues = map (\\r -> emergentGravityAcceleration r mass a0) rValues\n  \n  -- Convert to velocities (v = √(r·a))\n  let vNewtonValues = zipWith (\\r a -> sqrt (r * a)) rValues aNewtonValues\n      vTotalValues = zipWith (\\r a -> sqrt (r * a)) rValues aTotalValues\n  \n  -- Print results\n  putStrLn \"Radius (kpc) | Newtonian v (km/s) | Emergent Gravity v (km/s)\"\n  putStrLn $ replicate 60 '-'\n  \n  -- Convert to km/s for display\n  let velocityData = zip3 kpcValues \n                          (map (/ 1000) vNewtonValues) \n                          (map (/ 1000) vTotalValues)\n  \n  -- Display sample points\n  let sampleIndices = [0, 24, 49, 74, 99]\n      samples = [v | (i, v) <- zip [0..] velocityData, i `elem` sampleIndices]\n  \n  mapM_ (\\(r, vn, vt) -> \n      putStrLn $ showF 1 r ++ \" kpc      | \" ++ \n                 showF 0 vn ++ \" km/s        | \" ++ \n                 showF 0 vt ++ \" km/s\") samples\n  \n  -- The emergent gravity model produces a flatter rotation curve\n  -- similar to observed galaxy behavior without particle dark matter\n\n-- | Format floating point numbers to specified precision\nshowF :: Int -> Double -> String\nshowF digits num = \n  let str = show (fromIntegral (round (num * 10^digits)) / 10^digits :: Double)\n  in if digits == 0 then takeWhile (/= '.') str else str\n\n-- | Example usage:\n-- calculateRotationCurve (1e10 * 2e30) 1.2e-10 30\n-- This calculates the rotation curve for a galaxy of 10 billion solar masses\n-- from 1 to 30 kpc, using the typical acceleration scale parameter."}
                       </code>
                     </pre>
                   </div>

@@ -147,54 +147,100 @@ export default function ScalarFieldPage() {
                     <h3 className="text-lg font-medium text-dark-pink mb-2">Computational Implementation</h3>
                     <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
                       <code>
-{`# Simplified implementation of f(R) gravity effects
-import numpy as np
-from scipy.integrate import solve_ivp
+{`module ScalarFieldGravity where
 
-def modified_gravity_potential(r, mass, alpha=0.1, beta=2.0):
-    """
-    Calculate gravitational potential with f(R) modification
+-- | Implementation of f(R) Modified Gravity in Haskell
+-- This model demonstrates how gravity modifications can create
+-- dark-matter-like effects without introducing new particles
+
+-- | Gravitational constant in kpc^3/(solar mass * Gyr^2)
+gravConst :: Double
+gravConst = 4.3e-6
+
+-- | Calculate gravitational potential with f(R) modification
+-- This enhances gravity at large scales to mimic dark matter effects
+modifiedGravityPotential :: Double -> Double -> Double -> Double -> Double
+modifiedGravityPotential r mass alpha beta
+  | r <= 0 = 0  -- Guard against division by zero
+  | otherwise = phiNewton * modificationFactor
+  where
+    -- Standard Newtonian potential
+    phiNewton = negate $ gravConst * mass / r
     
-    Parameters:
-    -----------
-    r : float or array
-        Radial distance (kpc)
-    mass : float
-        Central mass (solar masses)
-    alpha : float
-        Strength of the modification
-    beta : float
-        Scale of the modification (kpc)
-        
-    Returns:
-    --------
-    float or array : Modified gravitational potential
-    """
-    # Constants
-    G = 4.3e-6  # Gravitational constant in kpc^3/(solar mass * Gyr^2)
-    
-    # Standard Newtonian potential
-    phi_newton = -G * mass / r
-    
-    # f(R) modification - enhances gravity at large scales
-    # This creates dark-matter-like effects without dark matter
-    phi_modified = phi_newton * (1 + alpha * (r / beta)**2 / (1 + (r / beta)**2))
-    
-    return phi_modified
+    -- f(R) modification factor - enhances gravity at large scales
+    -- This creates dark-matter-like effects without dark matter
+    modificationFactor = 1 + alpha * (r / beta)^2 / (1 + (r / beta)^2)
 
-# Calculate rotation curves for a galaxy
-r_values = np.linspace(0.1, 30, 100)  # kpc
-galaxy_mass = 1e11  # solar masses
+-- | Calculate rotation velocity from gravitational potential
+-- v^2 = r * (d/dr)Φ
+calculateVelocity :: [Double] -> [Double] -> [Double]
+calculateVelocity radii potentials =
+  zipWith3 velocityAtPoint radii potentials (tail potentials ++ [last potentials])
+  where
+    velocityAtPoint :: Double -> Double -> Double -> Double
+    velocityAtPoint r phi1 phi2 =
+      let dr = if r < 29.0 then 30.0 / 99 else 0.1  -- Approximate gradient step
+          dPhi = (phi2 - phi1) / dr
+      in sqrt $ abs $ r * dPhi
 
-# Standard Newtonian potential and velocity
-potential_newton = -4.3e-6 * galaxy_mass / r_values
-v_newton = np.sqrt(r_values * np.gradient(potential_newton, r_values))
+-- | Calculate rotation curves for a galaxy with f(R) modified gravity
+calculateRotationCurves :: Double -> Double -> Double -> IO ()
+calculateRotationCurves galaxyMass alpha beta = do
+  putStrLn "f(R) Modified Gravity Rotation Curve Analysis"
+  putStrLn "------------------------------------------"
+  putStrLn $ "Galaxy mass: " ++ show (galaxyMass / 1.0e10) ++ " × 10¹⁰ solar masses"
+  putStrLn $ "Alpha (modification strength): " ++ show alpha
+  putStrLn $ "Beta (modification scale): " ++ show beta ++ " kpc"
+  putStrLn ""
+  putStrLn "Radius (kpc) | v_Newton (km/s) | v_Modified (km/s) | Enhancement"
+  putStrLn "--------------------------------------------------------------"
+  
+  -- Create radius values from 0.1 to 30 kpc
+  let radii = [0.1, 0.4..30.0]
+  
+  -- Calculate potentials
+  let potentialsNewton = map (\r -> negate $ gravConst * galaxyMass / r) radii
+      potentialsModified = map (\r -> modifiedGravityPotential r galaxyMass alpha beta) radii
+  
+  -- Calculate velocities (convert to km/s)
+  let velocitiesNewton = map (*1000) $ calculateVelocity radii potentialsNewton
+      velocitiesModified = map (*1000) $ calculateVelocity radii potentialsModified
+  
+  -- Print sample points
+  let sampleIndices = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99]
+      samples = map (\\i -> (radii !! i, velocitiesNewton !! i, velocitiesModified !! i)) sampleIndices
+  
+  mapM_ (\\(r, vn, vm) -> do
+    let enhancement = vm / vn
+        formatNum n = if n < 10 then " " ++ showFFloat 1 n else showFFloat 1 n
+    putStrLn $ padRight 12 (showFFloat 1 r) ++ 
+               "| " ++ padRight 14 (formatNum vn) ++ 
+               "| " ++ padRight 16 (formatNum vm) ++ 
+               "| " ++ showFFloat 2 enhancement ++ "×"
+    ) samples
+  
+  putStrLn ""
+  putStrLn "Note: The modified gravity model produces a flat rotation curve"
+  putStrLn "at large radii without requiring dark matter particles."
 
-# Modified gravity potential and velocity
-potential_modified = modified_gravity_potential(r_values, galaxy_mass)
-v_modified = np.sqrt(r_values * np.gradient(potential_modified, r_values))
+-- | Helper function for fixed precision display
+showFFloat :: Int -> Double -> String
+showFFloat digits num = 
+  let str = show (fromIntegral (round (num * 10^digits)) / 10^digits :: Double)
+  in if digits == 0 then takeWhile (/= '.') str else str
 
-# Results show flat rotation curves without dark matter particles`}
+-- | Padding helper for table formatting
+padRight :: Int -> String -> String
+padRight width str = str ++ replicate (width - length str) ' '
+
+{- 
+Example usage:
+calculateRotationCurves 1.0e11 0.1 2.0
+
+This shows how a galaxy with 10^11 solar masses would have
+a flat rotation curve with f(R) gravity modification,
+without requiring dark matter particles.
+-}`}
                       </code>
                     </pre>
                   </div>

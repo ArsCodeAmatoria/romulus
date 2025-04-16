@@ -19,6 +19,7 @@ export default function ScalarFieldPage() {
             <TabsTrigger value="overview" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Overview</TabsTrigger>
             <TabsTrigger value="boundary" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Boundary Theory</TabsTrigger>
             <TabsTrigger value="equations" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Scalar Field Equations</TabsTrigger>
+            <TabsTrigger value="haskell" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Haskell Implementation</TabsTrigger>
             <TabsTrigger value="implications" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Implications</TabsTrigger>
           </TabsList>
           
@@ -198,6 +199,233 @@ v_modified = np.sqrt(r_values * np.gradient(potential_modified, r_values))
                       </code>
                     </pre>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="haskell" className="mt-6">
+            <Card className="bg-black border-dark-pink/20">
+              <CardHeader>
+                <CardTitle className="text-white">Scalar Field Models in Haskell</CardTitle>
+                <CardDescription className="text-white/70">
+                  Functional representation of f(R) gravity and scalar fields
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-white/80 space-y-4">
+                <p>
+                  Haskell's pure functional paradigm provides an elegant way to express the mathematical models of scalar field theories.
+                  Below are implementations of key equations and models using Haskell's type system and higher-order functions.
+                </p>
+                
+                <div className="space-y-6 mt-4">
+                  <div>
+                    <h3 className="text-lg font-medium text-dark-pink mb-2">Tensor Type Representation</h3>
+                    <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
+                      <code>
+{`-- Type definitions for tensor representations
+module ScalarField.Types where
+
+import qualified Data.Vector as V
+import qualified Data.Array as A
+
+-- Represent a spacetime point
+type Coords = (Double, Double, Double, Double)  -- (t, x, y, z)
+
+-- Tensor type definitions
+newtype Scalar = Scalar Double
+  deriving (Show, Eq)
+
+-- Vector representation
+newtype FourVector = FourVector (V.Vector Double)
+  deriving (Show, Eq)
+
+-- Rank 2 tensor (4x4 matrix for spacetime)
+newtype MetricTensor = MetricTensor (A.Array (Int, Int) Double)
+  deriving (Show, Eq)
+
+-- The f(R) function that modifies general relativity
+type FRFunction = Scalar -> Scalar  -- Takes curvature scalar R, returns f(R)
+
+-- Scalar field definition
+type ScalarField = Coords -> Scalar  -- Maps a spacetime point to a scalar value`}
+                      </code>
+                    </pre>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-medium text-dark-pink mb-2">f(R) Gravity Implementation</h3>
+                    <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
+                      <code>
+{`-- f(R) gravity modifications
+module ScalarField.FRGravity where
+
+import ScalarField.Types
+import qualified Data.Array as A
+
+-- Standard f(R) gravity models
+-- Hu-Sawicki model: f(R) = -m² (c₁(R/m²)ⁿ) / (c₂(R/m²)ⁿ + 1)
+huSawicki :: Double -> Double -> Double -> FRFunction
+huSawicki c1 c2 n (Scalar r) = 
+  let m2 = 1.0e-67  -- m² in appropriate units
+      rTerm = r / m2
+  in Scalar (-m2 * c1 * (rTerm ** n) / (c2 * (rTerm ** n) + 1))
+
+-- Starobinsky model: f(R) = αR² for large R
+starobinsky :: Double -> FRFunction
+starobinsky alpha (Scalar r) = Scalar (alpha * r * r)
+
+-- Modified Einstein field equations with f(R) term
+-- G_μν + f(R)g_μν = (8πG/c⁴)T_μν
+einsteinfR :: FRFunction -> MetricTensor -> MetricTensor -> MetricTensor
+einsteinfR fR (MetricTensor g) (MetricTensor t) = 
+  let 
+      -- Calculate Ricci scalar from metric (simplified)
+      calcR = Scalar 0.0  -- Placeholder for actual calculation
+      
+      -- Apply f(R) modification
+      frTerm = fR calcR
+      
+      -- Physical constants
+      kappa = 8.0 * pi * 6.67e-11 / (3.0e8 ** 4)  -- 8πG/c⁴
+      
+      -- Create modified tensor
+      modify (i, j) gVal = 
+        let tVal = t A.! (i, j)
+            Scalar frVal = frTerm
+        in gVal + frVal * gVal - kappa * tVal
+        
+      -- Create array bounds from input
+      bounds = A.bounds g
+  in
+      MetricTensor $ A.array bounds [(idx, modify idx (g A.! idx)) | idx <- A.range bounds]`}
+                      </code>
+                    </pre>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium text-dark-pink mb-2">Scalar Field Model</h3>
+                    <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
+                      <code>
+{`-- Scalar field implementation for dark matter effects
+module ScalarField.Model where
+
+import ScalarField.Types
+
+-- Scalar-Tensor theory implementation
+type ScalarTensorCoupling = ScalarField -> MetricTensor -> MetricTensor
+
+-- Basic scalar field that depends on radius from galactic center
+-- φ(r) = φ₀ exp(-r/r_s) represents a scalar field that modifies gravity
+scalarFieldRadial :: Double -> Double -> Coords -> Scalar
+scalarFieldRadial phi0 rs (t, x, y, z) = 
+  let r = sqrt (x*x + y*y + z*z)  -- Simplified radial distance
+  in Scalar (phi0 * exp (-r / rs))
+
+-- Modified Newtonian potential with scalar field effects
+-- Φ(r) = -GM/r · (1 + α·exp(-r/rs))
+modifiedPotential :: Double -> Double -> Double -> Double -> Double
+modifiedPotential mass alpha rs r =
+  let 
+      g = 4.3e-6  -- G in kpc³/(solar mass · Gyr²)
+      newtonPotential = -g * mass / r
+      modification = 1.0 + alpha * exp (-r / rs)
+  in newtonPotential * modification
+
+-- Calculate rotation curve velocity from potential
+-- v²(r) = r · dΦ/dr
+rotationVelocity :: Double -> Double -> Double -> Double -> Double
+rotationVelocity mass alpha rs r =
+  let 
+      g = 4.3e-6
+      -- Standard Newtonian term
+      vNewton2 = g * mass / r
+      
+      -- Scalar field modification term
+      modTerm = alpha * exp (-r / rs) * (1.0 + r / rs)
+  in sqrt (vNewton2 * (1.0 + modTerm))
+
+-- Dark matter as boundary condition implementation
+-- Similar to edge detection in image processing
+edgeDetector :: Double -> Double -> Double -> ScalarField
+edgeDetector threshold sharpness scale (_, x, y, z) =
+  let r = sqrt (x*x + y*y + z*z)
+      densityGradient = exp (-r / scale)  -- Simplified stand-in for actual density
+      edge = 1.0 / (1.0 + exp (-sharpness * (densityGradient - threshold)))
+  in Scalar edge`}
+                      </code>
+                    </pre>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium text-dark-pink mb-2">Simulation Example</h3>
+                    <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
+                      <code>
+{`-- Example usage for galaxy rotation curve simulation
+module ScalarField.Simulation where
+
+import ScalarField.Model
+import ScalarField.Types
+import qualified Data.Vector as V
+
+-- Simulate a galaxy rotation curve with scalar field modified gravity
+simulateGalaxy :: Double -> V.Vector Double -> V.Vector Double
+simulateGalaxy galaxyMass radii =
+  let 
+      -- Parameters for scalar field model
+      alpha = 0.5       -- Strength of modification
+      rs = 15.0         -- Scale radius in kpc
+      
+      -- Calculate velocity at each radius
+      velocities = V.map (rotationVelocity galaxyMass alpha rs) radii
+  in 
+      velocities
+
+-- Calculate both Newtonian and modified gravity for comparison
+compareModels :: Double -> V.Vector Double -> (V.Vector Double, V.Vector Double)
+compareModels galaxyMass radii =
+  let 
+      g = 4.3e-6
+      -- Standard Newtonian velocities
+      vNewton = V.map (\r -> sqrt (g * galaxyMass / r)) radii
+      
+      -- Velocities with scalar field modification
+      vModified = simulateGalaxy galaxyMass radii
+  in
+      (vNewton, vModified)
+
+{- 
+Example usage:
+
+main :: IO ()
+main = do
+  let radii = V.fromList [1.0, 2.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0]
+      galaxyMass = 1.0e11  -- solar masses
+      (vNewton, vModified) = compareModels galaxyMass radii
+  
+  putStrLn "Radius (kpc) | Newtonian v (km/s) | Modified v (km/s)"
+  putStrLn "---------------------------------------------------"
+  
+  V.zipWith3 (\r vn vm -> 
+      putStrLn $ show r ++ " | " ++ show vn ++ " | " ++ show vm)
+    radii vNewton vModified
+-}`}
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+                
+                <div className="mt-6 p-4 bg-dark-pink/10 rounded-md">
+                  <p className="text-dark-pink font-medium">Why Haskell for Physics?</p>
+                  <p className="mt-2">
+                    Haskell's pure functional approach offers several advantages for theoretical physics:
+                  </p>
+                  <ul className="list-disc pl-6 mt-2 space-y-1">
+                    <li>Mathematical expressions map directly to functions</li>
+                    <li>Type system can represent physical quantities and enforce correct dimensions</li>
+                    <li>Referential transparency ensures equations behave like true mathematical expressions</li>
+                    <li>Higher-order functions allow elegant representation of field theories and operators</li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>

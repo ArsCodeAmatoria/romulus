@@ -21,7 +21,8 @@ This approach could explain why direct detection experiments have consistently f
 - **Interactive 3D Visualizations**: Space-time curvature demonstrations using Three.js and React Three Fiber
 - **Theory Explorer**: Documentation hub for various modified gravity approaches
 - **Mathematical Explanations**: Complex equations rendered with KaTeX
-- **Code Examples**: Sample implementations of modified gravity calculations
+- **Code Examples**: Sample implementations of modified gravity calculations in Python and Haskell
+- **Interactive Python Terminal**: Run gravity simulations directly in your browser using Pyodide
 - **Modern Dark UI**: Sleek black background with pink neon accents
 
 ## Theories Covered
@@ -39,8 +40,11 @@ This approach could explain why direct detection experiments have consistently f
 - Tailwind CSS
 - shadcn/ui components
 - Three.js with @react-three/fiber and @react-three/drei
+- Pyodide for in-browser Python execution
+- CodeMirror for code editing
 - Framer Motion for animations
 - KaTeX for LaTeX math rendering
+- Plotly.js for interactive plots and visualizations
 
 ## Getting Started
 

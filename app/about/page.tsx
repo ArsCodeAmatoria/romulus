@@ -50,6 +50,23 @@ export default function AboutPage() {
           </section>
           
           <section className="mb-12">
+            <h2 className="text-2xl font-semibold text-dark-pink mb-4">Why Haskell for Theoretical Physics</h2>
+            <p className="text-white/80 mb-4">
+              Romulus implements its physics models using Haskell, a pure functional programming language that offers unique advantages for theoretical physics:
+            </p>
+            <ul className="list-disc list-inside text-white/80 space-y-2 mb-4">
+              <li>Mathematical precision: Haskell's pure functions directly mirror mathematical equations, making implementations more faithful to theory</li>
+              <li>Type safety: Strong static typing prevents dimensional errors common in physics calculations</li>
+              <li>Reasoning clarity: The absence of side effects makes it easier to reason about complex physical models</li>
+              <li>Lazy evaluation: Allows for representation of infinite series and other mathematical structures important in physics</li>
+              <li>Academic adoption: Used at research institutions like CERN, Los Alamos National Laboratory, and various physics departments</li>
+            </ul>
+            <p className="text-white/80">
+              These characteristics make Haskell particularly suitable for implementing the modified gravity models we explore, where mathematical precision and clear expression of complex ideas are paramount.
+            </p>
+          </section>
+          
+          <section className="mb-12">
             <h2 className="text-2xl font-semibold text-dark-pink mb-4">Tech Stack</h2>
             <p className="text-white/80 mb-4">
               Built with modern web technologies to provide an immersive educational experience:
@@ -61,6 +78,7 @@ export default function AboutPage() {
               <li>Three.js with @react-three/fiber and @react-three/drei</li>
               <li>Framer Motion for animations</li>
               <li>KaTeX for LaTeX math rendering</li>
+              <li>Haskell for physics model implementations</li>
             </ul>
           </section>
           

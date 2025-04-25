@@ -8,10 +8,17 @@ import {
   Orbit, 
   Rocket, 
   Atom, 
-  Sparkles 
+  Sparkles,
+  Waves
 } from 'lucide-react';
 
 const theories = [
+  {
+    title: "Dark Matter as Anti-Gravity",
+    description: "Reimagining dark matter as a repulsive gravitational effect that shapes spacetime",
+    link: "/docs/anti-gravity",
+    icon: <Waves className="text-dark-pink" size={28} />
+  },
   {
     title: "General Relativity + Effective Tensor Modifications",
     description: "Einstein's General Relativity and tensor-based modifications to explain dark matter effects",

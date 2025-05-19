@@ -49,7 +49,7 @@ export function ComparisonDashboard() {
 
   // State for data
   const [pantheonData, setPantheonData] = useState<any>(null);
-  const [planckData, setPlanckData] = useState<any>(null);
+  const [planckData, setPlanckData] = useState<{ l: number; cl: number; clErr: number }[] | null>(null);
 
   // Load Pantheon+ data
   useEffect(() => {
@@ -101,6 +101,29 @@ export function ComparisonDashboard() {
       const dl = (1 + z) * 2997.92458 * (1 / Math.sqrt(hsq)); // Simplified
       const mu = 5 * Math.log10(dl * 1e6 / 10);
       return { z, mu };
+    });
+  };
+
+  // Compute AGDEF CMB predictions (simple demo model)
+  const computeAGDEFCMB = () => {
+    if (!planckData) return [];
+    return planckData.map((d: { l: number }) => {
+      const l = d.l;
+      // AGDEF modifies ISW at low l
+      const base = 1; // Placeholder for base power spectrum
+      const agdefEffect = params.kappa * (params.omegaDE + params.evolutionRate * Math.exp(-l / 30));
+      return { x: l, y: base * (1 + agdefEffect) };
+    });
+  };
+
+  // Compute LCDM CMB predictions (simple demo model)
+  const computeLCDMCMB = () => {
+    if (!planckData) return [];
+    return planckData.map((d: { l: number }) => {
+      const l = d.l;
+      const base = 1; // Placeholder for base power spectrum
+      const lcdmEffect = 0.7; // Fixed for LCDM
+      return { x: l, y: base * (1 + lcdmEffect) };
     });
   };
 
@@ -158,6 +181,74 @@ export function ComparisonDashboard() {
         title: {
           display: true,
           text: 'Distance Modulus (μ)',
+        },
+      },
+    },
+  };
+
+  // Prepare CMB chart data
+  const cmbChartData = {
+    datasets: [
+      {
+        label: 'Planck Data',
+        data: planckData?.map((d: any) => ({ x: d.l, y: d.cl })),
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: 'rgb(255, 99, 132)',
+        pointRadius: 2,
+        showLine: false,
+      },
+      ...(showLCDM ? [{
+        label: 'ΛCDM',
+        data: computeLCDMCMB(),
+        borderColor: 'rgb(54, 162, 235)',
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        borderWidth: 2,
+        pointRadius: 0,
+        showLine: true,
+      }] : []),
+      ...(showAGDEF ? [{
+        label: 'AGDEF',
+        data: computeAGDEFCMB(),
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        borderWidth: 2,
+        pointRadius: 0,
+        showLine: true,
+      }] : []),
+    ],
+  };
+
+  // CMB chart options
+  const cmbChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'CMB Power Spectrum vs Multipole Moment',
+      },
+      tooltip: {
+        backgroundColor: '#18181b',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: '#a21caf',
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      x: {
+        type: 'linear' as const,
+        title: {
+          display: true,
+          text: 'Multipole Moment (ℓ)',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Power Spectrum (Cℓ)',
         },
       },
     },
@@ -245,9 +336,9 @@ export function ComparisonDashboard() {
             </TabsContent>
 
             <TabsContent value="cmb" className="space-y-4">
-              {/* CMB Plot will be added here */}
-              <div className="h-[400px] bg-zinc-900/50 p-4 rounded-md flex items-center justify-center text-white/60">
-                CMB multipole comparison coming soon...
+              {/* CMB Plot: AGDEF vs LCDM vs Planck */}
+              <div className="h-[400px] bg-zinc-900/50 p-4 rounded-md">
+                <Line data={cmbChartData} options={cmbChartOptions} />
               </div>
             </TabsContent>
           </Tabs>

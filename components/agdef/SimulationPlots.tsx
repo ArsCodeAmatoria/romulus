@@ -49,7 +49,17 @@ export function SimulationPlots() {
               <YAxis 
                 label={{ value: 'Distance Modulus (μ)', angle: -90, position: 'insideLeft' }} 
               />
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  background: "#18181b",
+                  color: "#fff",
+                  border: "1px solid #a21caf",
+                  borderRadius: "8px"
+                }}
+                itemStyle={{
+                  color: "#fff"
+                }}
+              />
               <Legend />
               <Line 
                 type="monotone" 
@@ -83,7 +93,17 @@ export function SimulationPlots() {
               <YAxis 
                 label={{ value: 'Luminosity Distance (Mpc)', angle: -90, position: 'insideLeft' }} 
               />
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  background: "#18181b",
+                  color: "#fff",
+                  border: "1px solid #a21caf",
+                  borderRadius: "8px"
+                }}
+                itemStyle={{
+                  color: "#fff"
+                }}
+              />
               <Legend />
               <Line 
                 type="monotone" 

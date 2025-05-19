@@ -49,7 +49,17 @@ export function ObservationPlots() {
                 name="Distance Modulus" 
                 label={{ value: 'Distance Modulus (μ)', angle: -90, position: 'insideLeft' }} 
               />
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  background: "#18181b",
+                  color: "#fff",
+                  border: "1px solid #a21caf",
+                  borderRadius: "8px"
+                }}
+                itemStyle={{
+                  color: "#fff"
+                }}
+              />
               <Legend />
               <Scatter 
                 name="Pantheon+ Data" 
@@ -74,7 +84,17 @@ export function ObservationPlots() {
               <YAxis 
                 label={{ value: 'Power Spectrum (Cℓ)', angle: -90, position: 'insideLeft' }} 
               />
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  background: "#18181b",
+                  color: "#fff",
+                  border: "1px solid #a21caf",
+                  borderRadius: "8px"
+                }}
+                itemStyle={{
+                  color: "#fff"
+                }}
+              />
               <Legend />
               <Line 
                 type="monotone" 

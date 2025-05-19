@@ -51,34 +51,48 @@ export function ComparisonDashboard() {
   const [pantheonData, setPantheonData] = useState<any>(null);
   const [planckData, setPlanckData] = useState<{ l: number; cl: number; clErr: number }[] | null>(null);
 
-  // Load Pantheon+ data
-  useEffect(() => {
-    fetch('/data/pantheon_plus.csv')
-      .then(response => response.text())
-      .then(csv => {
-        // Parse CSV and set data
-        const rows = csv.split('\n').slice(1); // Skip header
-        const data = rows.map(row => {
-          const [z, mu, muErr] = row.split(',').map(Number);
-          return { z, mu, muErr };
-        });
-        setPantheonData(data);
-      });
-  }, []);
+  // Add loading state
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load Planck data
+  // Update data loading with error handling
   useEffect(() => {
-    fetch('/data/planck_cmb_isw.csv')
-      .then(response => response.text())
-      .then(csv => {
-        // Parse CSV and set data
-        const rows = csv.split('\n').slice(1); // Skip header
-        const data = rows.map(row => {
-          const [l, cl, clErr] = row.split(',').map(Number);
-          return { l, cl, clErr };
-        });
-        setPlanckData(data);
-      });
+    setIsLoading(true);
+    setError(null);
+    
+    Promise.all([
+      fetch('/data/pantheon_plus.csv')
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to load Pantheon+ data');
+          return response.text();
+        })
+        .then(csv => {
+          const rows = csv.split('\n').slice(1);
+          const data = rows.map(row => {
+            const [z, mu, muErr] = row.split(',').map(Number);
+            return { z, mu, muErr };
+          });
+          setPantheonData(data);
+        }),
+      fetch('/data/planck_cmb_isw.csv')
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to load Planck CMB data');
+          return response.text();
+        })
+        .then(csv => {
+          const rows = csv.split('\n').slice(1);
+          const data = rows.map(row => {
+            const [l, cl, clErr] = row.split(',').map(Number);
+            return { l, cl, clErr };
+          });
+          setPlanckData(data);
+        })
+    ]).catch(err => {
+      setError(err.message);
+      console.error('Error loading data:', err);
+    }).finally(() => {
+      setIsLoading(false);
+    });
   }, []);
 
   // Compute AGDEF predictions
@@ -104,26 +118,45 @@ export function ComparisonDashboard() {
     });
   };
 
-  // Compute AGDEF CMB predictions (simple demo model)
+  // Compute AGDEF CMB predictions with ISW effect
   const computeAGDEFCMB = () => {
     if (!planckData) return [];
     return planckData.map((d: { l: number }) => {
       const l = d.l;
-      // AGDEF modifies ISW at low l
-      const base = 1; // Placeholder for base power spectrum
-      const agdefEffect = params.kappa * (params.omegaDE + params.evolutionRate * Math.exp(-l / 30));
-      return { x: l, y: base * (1 + agdefEffect) };
+      // Base CMB power spectrum (simplified)
+      const baseCl = 1 / (l * (l + 1));
+      
+      // ISW effect contribution (enhanced at low l)
+      const iswEffect = params.kappa * (params.omegaDE + params.evolutionRate * Math.exp(-l / 30));
+      
+      // Sachs-Wolfe effect (dominant at low l)
+      const swEffect = 1.0;
+      
+      // Total power spectrum
+      const totalCl = baseCl * (swEffect + iswEffect);
+      
+      return { x: l, y: totalCl };
     });
   };
 
-  // Compute LCDM CMB predictions (simple demo model)
+  // Compute LCDM CMB predictions
   const computeLCDMCMB = () => {
     if (!planckData) return [];
     return planckData.map((d: { l: number }) => {
       const l = d.l;
-      const base = 1; // Placeholder for base power spectrum
-      const lcdmEffect = 0.7; // Fixed for LCDM
-      return { x: l, y: base * (1 + lcdmEffect) };
+      // Base CMB power spectrum (simplified)
+      const baseCl = 1 / (l * (l + 1));
+      
+      // LCDM ISW effect (constant)
+      const iswEffect = 0.7;
+      
+      // Sachs-Wolfe effect
+      const swEffect = 1.0;
+      
+      // Total power spectrum
+      const totalCl = baseCl * (swEffect + iswEffect);
+      
+      return { x: l, y: totalCl };
     });
   };
 
@@ -254,6 +287,57 @@ export function ComparisonDashboard() {
     },
   };
 
+  // Add tooltips for parameters
+  const parameterTooltips = {
+    kappa: "Anti-gravity coupling constant (κ) that determines the strength of the repulsive force",
+    omegaDE: "Dark energy density parameter (ΩDE) representing the current energy density of dark energy",
+    evolutionRate: "Rate at which the dark energy density evolves with redshift"
+  };
+
+  // Update the UI to include loading states and error handling
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="text-white">Loading data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
+
+  // Update the parameter sliders section with tooltips
+  const renderParameterSlider = (
+    label: string,
+    value: number,
+    onChange: (value: number) => void,
+    min: number,
+    max: number,
+    step: number,
+    tooltip: string
+  ) => (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-white">{label}</Label>
+        <div className="text-sm text-white/60">{value.toFixed(2)}</div>
+      </div>
+      <Slider
+        value={[value]}
+        onValueChange={([v]) => onChange(v)}
+        min={min}
+        max={max}
+        step={step}
+        className="mt-2"
+      />
+      <p className="text-sm text-white/60">{tooltip}</p>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <Card className="bg-black border-dark-pink/20">
@@ -292,41 +376,35 @@ export function ComparisonDashboard() {
                 </div>
               </div>
 
-              {/* AGDEF Parameters */}
+              {/* AGDEF Parameters with tooltips */}
               <div className="space-y-4">
-                <div>
-                  <Label className="text-white">Anti-gravity Coupling (κ)</Label>
-                  <Slider
-                    value={[params.kappa]}
-                    onValueChange={([value]) => setParams({ ...params, kappa: value })}
-                    min={0.5}
-                    max={2.0}
-                    step={0.1}
-                    className="mt-2"
-                  />
-                </div>
-                <div>
-                  <Label className="text-white">Dark Energy Density (ΩDE)</Label>
-                  <Slider
-                    value={[params.omegaDE]}
-                    onValueChange={([value]) => setParams({ ...params, omegaDE: value })}
-                    min={0.6}
-                    max={0.8}
-                    step={0.01}
-                    className="mt-2"
-                  />
-                </div>
-                <div>
-                  <Label className="text-white">Evolution Rate</Label>
-                  <Slider
-                    value={[params.evolutionRate]}
-                    onValueChange={([value]) => setParams({ ...params, evolutionRate: value })}
-                    min={0.0}
-                    max={0.1}
-                    step={0.01}
-                    className="mt-2"
-                  />
-                </div>
+                {renderParameterSlider(
+                  "Anti-gravity Coupling (κ)",
+                  params.kappa,
+                  (value) => setParams({ ...params, kappa: value }),
+                  0.5,
+                  2.0,
+                  0.1,
+                  parameterTooltips.kappa
+                )}
+                {renderParameterSlider(
+                  "Dark Energy Density (ΩDE)",
+                  params.omegaDE,
+                  (value) => setParams({ ...params, omegaDE: value }),
+                  0.6,
+                  0.8,
+                  0.01,
+                  parameterTooltips.omegaDE
+                )}
+                {renderParameterSlider(
+                  "Evolution Rate",
+                  params.evolutionRate,
+                  (value) => setParams({ ...params, evolutionRate: value }),
+                  0.0,
+                  0.1,
+                  0.01,
+                  parameterTooltips.evolutionRate
+                )}
               </div>
 
               {/* Supernovae Plot */}

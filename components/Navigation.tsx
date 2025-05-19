@@ -32,11 +32,22 @@ export default function Navigation() {
             </NavigationMenuItem>
             
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={`${pathname.startsWith('/docs') ? 'text-dark-pink' : 'text-white'}`}>
+              <NavigationMenuTrigger className={`${pathname.startsWith('/docs') || pathname === '/agdef' ? 'text-dark-pink' : 'text-white'}`}>
                 Theories
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
+                  <li>
+                    <Link 
+                      href="/agdef" 
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-dark-pink/10 hover:text-dark-pink"
+                    >
+                      <div className="text-sm font-medium leading-none">AGDEF Theory</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-white/70">
+                        5D curvature projection and dark energy field effects
+                      </p>
+                    </Link>
+                  </li>
                   <li>
                     <Link 
                       href="/docs/general-relativity" 
@@ -78,6 +89,17 @@ export default function Navigation() {
                       <div className="text-sm font-medium leading-none">Scalar Field Gravity</div>
                       <p className="line-clamp-2 text-sm leading-snug text-white/70">
                         f(R) and scalar field approaches to modified gravity
+                      </p>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link 
+                      href="/docs/quantum-gravity"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-dark-pink/10 hover:text-dark-pink"
+                    >
+                      <div className="text-sm font-medium leading-none">Quantum Gravity</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-white/70">
+                        Holographic principle and quantum approaches to gravity
                       </p>
                     </Link>
                   </li>

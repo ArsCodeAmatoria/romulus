@@ -9,10 +9,17 @@ import {
   Rocket, 
   Atom, 
   Sparkles,
-  Waves
+  Waves,
+  Zap
 } from 'lucide-react';
 
 const theories = [
+  {
+    title: "Anti-Gravity Dark Energy Field (AGDEF)",
+    description: "Dark energy as 5D curvature projected into 4D spacetime, with implications for cosmic acceleration and aging",
+    link: "/agdef",
+    icon: <Zap className="text-dark-pink" size={28} />
+  },
   {
     title: "Dark Matter as Anti-Gravity",
     description: "Reimagining dark matter as a repulsive gravitational effect that shapes spacetime",

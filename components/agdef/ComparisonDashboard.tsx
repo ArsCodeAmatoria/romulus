@@ -85,7 +85,7 @@ export function ComparisonDashboard() {
   const computeAGDEFPredictions = () => {
     const zVals = Array.from({ length: 100 }, (_, i) => i * 0.02);
     return zVals.map(z => {
-      const rhoAGDEF = params.omegaDE + params.evolutionRate * Math.exp(-z);
+      const rhoAGDEF = params.kappa * (params.omegaDE + params.evolutionRate * Math.exp(-z));
       const hsq = 0.3 * Math.pow(1 + z, 3) + rhoAGDEF;
       const dl = (1 + z) * 2997.92458 * (1 / Math.sqrt(hsq)); // Simplified
       const mu = 5 * Math.log10(dl * 1e6 / 10);

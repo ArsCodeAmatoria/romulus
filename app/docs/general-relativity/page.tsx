@@ -124,58 +124,10 @@ export default function GeneralRelativityPage() {
                 </div>
                 
                 <div className="mt-6">
-                  <h3 className="text-lg font-medium text-dark-pink mb-2">Example: Python Implementation</h3>
+                  <h3 className="text-lg font-medium text-dark-pink mb-2">Example: Haskell Implementation</h3>
                   <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
                     <code>
-{`import numpy as np
-from scipy.integrate import solve_ivp
-
-def modified_gravity_acceleration(r, mass, a0=1.2e-10):
-    """
-    Calculate acceleration under a simple modified gravity model
-    that transitions between Newtonian gravity and modified regime
-    
-    Parameters:
-    -----------
-    r : float
-        Radial distance (m)
-    mass : float
-        Central mass (kg)
-    a0 : float
-        Acceleration scale (m/s²) where modification becomes significant
-        
-    Returns:
-    --------
-    float : Radial acceleration (m/s²)
-    """
-    # Newtonian acceleration
-    a_newton = G * mass / r**2
-    
-    # Modification factor (example of a simple interpolation function)
-    mu = a_newton / (a_newton + a0)
-    
-    # Modified acceleration
-    a_mod = a_newton / mu
-    
-    return a_mod
-
-# Example: Calculate galaxy rotation curve
-G = 6.67430e-11  # Gravitational constant (m³/kg/s²)
-M_galaxy = 1e11 * 1.989e30  # Galaxy mass (kg)
-
-# Radii from 1 to 50 kpc
-radii = np.linspace(1, 50, 100) * 3.086e19  # Convert kpc to meters
-
-# Calculate accelerations
-a_newton = G * M_galaxy / radii**2
-a_modified = np.array([modified_gravity_acceleration(r, M_galaxy) for r in radii])
-
-# Convert to rotation velocities (v = sqrt(r*a))
-v_newton = np.sqrt(radii * a_newton)
-v_modified = np.sqrt(radii * a_modified)
-
-# The modified model produces a flatter rotation curve at large radii
-# similar to observed galaxy rotation curves`}
+{"module ModifiedGravity where\n\nimport Data.List (zipWith)\n\n-- | Gravitational constant (m³/kg/s²)\ng :: Double\ng = 6.67430e-11\n\n-- | Calculate acceleration under a simple modified gravity model\n-- that transitions between Newtonian gravity and modified regime\nmodifiedGravityAcceleration :: Double -> Double -> Double -> Double\nmodifiedGravityAcceleration r mass a0 = a_mod\n  where\n    -- Newtonian acceleration\n    a_newton = g * mass / r^2\n    \n    -- Modification factor (example of a simple interpolation function)\n    mu = a_newton / (a_newton + a0)\n    \n    -- Modified acceleration\n    a_mod = a_newton / mu\n\n-- | Convenience function for array calculations\nmap2 :: (a -> b -> c) -> [a] -> [b] -> [c]\nmap2 = zipWith\n\n-- | Example: Calculate galaxy rotation curve\ncalculateGalaxyRotationCurve :: IO ()\ncalculateGalaxyRotationCurve = do\n  -- Constants\n  let a0 = 1.2e-10  -- Acceleration scale (m/s²) where modification becomes significant\n      m_galaxy = 1e11 * 1.989e30  -- Galaxy mass (kg)\n      kpc_to_meters = 3.086e19  -- Conversion from kpc to meters\n      \n  -- Generate radii from 1 to 50 kpc (converted to meters)\n  let radii = map (* kpc_to_meters) [1.0, 1.5..50.0]\n  \n  -- Calculate accelerations\n  let a_newton = map (\\r -> g * m_galaxy / r^2) radii\n      a_modified = map (\\r -> modifiedGravityAcceleration r m_galaxy a0) radii\n  \n  -- Convert to rotation velocities (v = sqrt(r*a))\n  let v_newton = map2 (\\r a -> sqrt (r * a)) radii a_newton\n      v_modified = map2 (\\r a -> sqrt (r * a)) radii a_modified\n  \n  -- The modified model produces a flatter rotation curve at large radii\n  -- similar to observed galaxy rotation curves\n  putStrLn $ \"Radius (kpc) | Newtonian v (km/s) | Modified v (km/s)\"\n  putStrLn $ replicate 50 '-'\n  \n  -- Print a few sample points (converting back to kpc and km/s)\n  let sampleIndices = [0, 9, 19, 29, 39, 49]\n      samples = [(i, r / kpc_to_meters, v_n / 1000, v_m / 1000) | \n                 (i, r, v_n, v_m) <- zip4 [0..] radii v_newton v_modified, \n                 i `elem` sampleIndices]\n  \n  mapM_ (\\(_, r, v_n, v_m) -> \n      putStrLn $ show (round r :: Int) ++ \"            | \" ++ \n                 show (round v_n :: Int) ++ \"               | \" ++ \n                 show (round v_m :: Int)) samples\n\n-- Benefits of using Haskell for theoretical physics:\n-- * Pure functions map closely to mathematical equations\n-- * Strong type system prevents dimensional errors\n-- * Lazy evaluation allows for efficient handling of infinite data structures\n-- * Elegant expression of complex mathematical concepts\n-- * Pattern matching simplifies implementation of case-specific physics equations"}
                     </code>
                   </pre>
                 </div>
@@ -193,9 +145,10 @@ v_modified = np.sqrt(radii * a_modified)
               </CardHeader>
               <CardContent className="text-white/80">
                 <p className="mb-4">
-                  This interactive visualization shows how mass curves spacetime in both 
-                  standard General Relativity and in modified gravity theories. Use the 
-                  controls to adjust the mass and switch between theories.
+                  This interactive visualization demonstrates how mass curves spacetime in both 
+                  standard General Relativity and in modified gravity theories. 
+                  The grid represents spacetime being deformed by the central mass.
+                  Use the controls to adjust the mass and switch between theories.
                 </p>
                 <div className="bg-zinc-900/50 p-4 rounded-md">
                   <SpacetimeCurvature />

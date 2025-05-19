@@ -142,75 +142,7 @@ export default function MONDPage() {
                     <h3 className="text-lg font-medium text-dark-pink mb-2">MOND Implementation</h3>
                     <pre className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-sm">
                       <code>
-{`import numpy as np
-import matplotlib.pyplot as plt
-
-def mond_acceleration(r, mass, a0=1.2e-10):
-    """
-    Calculate acceleration under MOND
-    
-    Parameters:
-    -----------
-    r : float or array
-        Radius (meters)
-    mass : float
-        Total baryonic mass (kg)
-    a0 : float
-        MOND critical acceleration (m/s²)
-        
-    Returns:
-    --------
-    float or array : Total acceleration
-    """
-    # Newtonian acceleration from visible matter
-    G = 6.67430e-11  # Gravitational constant
-    a_N = G * mass / r**2
-    
-    # Interpolation function (standard form)
-    def mu(x):
-        return x / np.sqrt(1 + x**2)
-    
-    # Solve for actual acceleration using MOND equation
-    # For numerical stability, handle deep-MOND and Newtonian limits
-    deep_mond = a_N < 0.01 * a0
-    newtonian = a_N > 100 * a0
-    
-    a = np.zeros_like(a_N)
-    
-    # Deep-MOND approximation
-    mask = deep_mond
-    a[mask] = np.sqrt(a_N[mask] * a0)
-    
-    # Newtonian approximation
-    mask = newtonian
-    a[mask] = a_N[mask]
-    
-    # Numerical solution for intermediate regime
-    mask = ~(deep_mond | newtonian)
-    if np.any(mask):
-        for i, idx in enumerate(np.where(mask)[0]):
-            # Iterative solution for a * mu(a/a0) = a_N
-            a_est = a_N[idx]
-            for _ in range(10):  # Converges quickly
-                a_est = a_N[idx] / mu(a_est / a0)
-            a[idx] = a_est
-            
-    return a
-
-# Example for a typical spiral galaxy
-galaxy_mass = 5e10 * 1.989e30  # 50 billion solar masses
-r_range = np.logspace(19, 22, 100)  # ~1 kpc to ~300 kpc
-
-# Calculate accelerations
-a_newton = 6.67430e-11 * galaxy_mass / r_range**2
-a_mond = mond_acceleration(r_range, galaxy_mass)
-
-# Calculate velocities
-v_newton = np.sqrt(r_range * a_newton)
-v_mond = np.sqrt(r_range * a_mond)
-
-# The MOND velocity curve becomes flat at large radii
-# while Newtonian falls off as 1/sqrt(r)`}
+{"module MOND where\n\n-- | Implementation of Modified Newtonian Dynamics (MOND) in Haskell\n-- Shows how functional programming naturally expresses physical laws\n\n-- | Gravitational constant (m³/kg/s²)\ngravConst :: Double\ngravConst = 6.67430e-11\n\n-- | MOND critical acceleration parameter (m/s²)\na0 :: Double\na0 = 1.2e-10  -- Approximately 1/10 billionth of Earth's surface gravity\n\n-- | Standard MOND interpolation function\n-- Used to transition between Newtonian and modified regimes\nmuFunction :: Double -> Double\nmuFunction x = x / sqrt (1 + x*x)\n\n-- | Simple interpolation function (alternative)\nmuSimple :: Double -> Double\nmuSimple x = x / (1 + x)\n\n-- | Calculate acceleration under MOND for a given radius and mass\n-- This implements the full MOND equation with proper handling of\n-- both deep-MOND and Newtonian regimes\nmondAcceleration :: Double -> Double -> Double -> Double\nmondAcceleration r mass a0' \n  | r <= 0 || mass <= 0 = 0  -- Guard against invalid inputs\n  | otherwise = case regime of\n      Newtonian  -> newtonianAcc\n      DeepMOND   -> sqrt (newtonianAcc * a0')\n      Transitional -> solveMondeqn newtonianAcc 10\n  where\n    -- Calculate Newtonian acceleration\n    newtonianAcc = gravConst * mass / (r * r)\n    \n    -- Determine which acceleration regime we're in\n    regime\n      | newtonianAcc > 100 * a0' = Newtonian\n      | newtonianAcc < 0.01 * a0' = DeepMOND\n      | otherwise = Transitional\n      \n    -- Iteratively solve MOND equation: a * mu(a/a0) = a_N\n    -- This converges quickly with a few iterations\n    solveMondeqn :: Double -> Int -> Double\n    solveMondeqn _ 0 = newtonianAcc  -- Fallback\n    solveMondeqn aN n = \n      let a' = aN / muFunction (a / a0')\n          a = solveMondeqn aN (n-1)  \n      in if abs (a' - a) < 1e-10 * a then a' else a'\n\n-- | Enumerate different acceleration regimes\ndata AccelerationRegime = Newtonian | DeepMOND | Transitional\n\n-- | Calculate rotation curves for a galaxy\ncalculateRotationCurve :: Double -> IO ()\ncalculateRotationCurve galaxyMass = do\n  putStrLn \"MOND Rotation Curve Analysis\"\n  putStrLn \"----------------------------\"\n  putStrLn $ \"Galaxy mass: \" ++ show (galaxyMass / (1.989e30)) ++ \" solar masses\"\n  putStrLn \"\"\n  putStrLn \"Radius (kpc) | v_Newton (km/s) | v_MOND (km/s) | Regime\"\n  putStrLn \"---------------------------------------------------------\"\n  \n  -- Sample points from 1 to 30 kpc\n  let kpcToM = 3.086e19\n      radii = [1, 5, 10, 15, 20, 25, 30]\n      radiusPoints = map (* kpcToM) radii\n  \n  -- Calculate and display results\n  mapM_ (\\(i, r) -> do\n    let aN = gravConst * galaxyMass / (r * r)\n        a = mondAcceleration r galaxyMass a0\n        vN = sqrt (r * aN) / 1000  -- km/s\n        vM = sqrt (r * a) / 1000   -- km/s\n        regime\n          | aN > 10 * a0 = \"Newtonian\"\n          | aN < 0.1 * a0 = \"Deep-MOND\"\n          | otherwise = \"Transition\"\n    \n    putStrLn $ padRight 12 (show i) ++ \n               \"| \" ++ padRight 14 (showF 1 vN) ++ \n               \"| \" ++ padRight 13 (showF 1 vM) ++ \n               \"| \" ++ regime\n    ) (zip radii radiusPoints)\n  \n  putStrLn \"\"\n  putStrLn \"Note: The MOND velocity curve becomes flat at large radii,\"\n  putStrLn \"while Newtonian velocity falls off as 1/sqrt(r)\"\n\n-- | Helper function for fixed precision display\nshowF :: Int -> Double -> String\nshowF digits num = \n  let str = show (fromIntegral (round (num * 10^digits)) / 10^digits :: Double)\n  in if digits == 0 then takeWhile (/= '.') str else str\n\n-- | Padding helper for table formatting\npadRight :: Int -> String -> String\npadRight width str = str ++ replicate (width - length str) ' '\n\n-- Example usage:\n-- calculateRotationCurve (5e10 * 1.989e30)  -- 50 billion solar masses"}
                       </code>
                     </pre>
                   </div>

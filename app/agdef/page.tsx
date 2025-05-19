@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DisplayMath, InlineMath } from "@/components/ui/math";
 import { SimulationPlots } from "@/components/agdef/SimulationPlots";
 import { ObservationPlots } from "@/components/agdef/ObservationPlots";
+import { ComparisonDashboard } from "@/components/agdef/ComparisonDashboard";
+import { CMBComparison } from "@/components/agdef/CMBComparison"
 
 export default function AGDEFPage() {
   return (
@@ -26,6 +28,7 @@ export default function AGDEFPage() {
             <TabsTrigger value="simulation" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Simulation</TabsTrigger>
             <TabsTrigger value="observations" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Observations</TabsTrigger>
             <TabsTrigger value="aging" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Aging Theory</TabsTrigger>
+            <TabsTrigger value="cmb" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">CMB Comparison</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="mt-6">
@@ -467,15 +470,21 @@ export default function AGDEFPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-white/80 space-y-8">
+                <ComparisonDashboard />
+                
                 <div>
                   <h3 className="text-lg font-medium text-dark-pink mb-4">Haskell Implementation</h3>
                   <div className="space-y-4">
                     <p>
                       The AGDEF theory is implemented in Haskell using linear algebra operations, modeling the 
-                      5D to 4D projection of the anti-gravity tensor:
+                      5D to 4D projection of the anti-gravity tensor, cosmic evolution, and biological aging:
                     </p>
-                    <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto">
-                      <pre className="text-sm font-mono">
+
+                    <div className="space-y-6">
+                      {/* Tensor Operations Section */}
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2 font-mono">Tensor Operations</h4>
+                        <pre className="text-sm font-mono">
 {`-- Tensor definition (simplified 4D projection of 5D matrix)
 stressTensor5D :: Matrix Double
 stressTensor5D = (5><5)
@@ -500,18 +509,115 @@ projectionMatrix = (5><4)
 
 -- Perform dimensional projection
 projectAntiGravity :: Matrix Double -> Matrix Double
-projectAntiGravity ag5 = tr projectionMatrix <> ag5 <> projectionMatrix
+projectAntiGravity ag5 = tr projectionMatrix <> ag5 <> projectionMatrix`}
+                        </pre>
+                      </div>
 
-main :: IO ()
+                      {/* Cosmic Evolution Section */}
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2 font-mono">Cosmic Evolution</h4>
+                        <pre className="text-sm font-mono">
+{`-- AGDEF energy contribution function (evolving dark energy component)
+traceAGDEF :: Double -> Double
+traceAGDEF z = 0.7 + 0.05 * exp(-z / 1.0)
+
+-- Hubble parameter squared (AGDEF version)
+hubbleSq :: Double -> Double
+hubbleSq z =
+  let rho_m = 0.3 * (1 + z) ** 3
+      rho_agdef = traceAGDEF z
+  in rho_m + rho_agdef
+
+-- Numerical integral for luminosity distance
+luminosityDistance :: Double -> Double
+luminosityDistance z =
+  let integrand z' = 1 / sqrt (hubbleSq z')
+      (res, _) = integrateQAGS integrand 1e-9 1e-9 1000 0 z
+  in (1 + z) * res * 2997.92458  -- c/H0 in Mpc
+
+-- Distance modulus
+distanceModulus :: Double -> Double
+distanceModulus z =
+  let dl = luminosityDistance z  -- in Mpc
+  in 5 * logBase 10 (dl * 1e6 / 10)  -- convert to parsecs and apply formula`}
+                        </pre>
+                      </div>
+
+                      {/* ISW Effect Section */}
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2 font-mono">ISW Effect Calculation</h4>
+                        <pre className="text-sm font-mono">
+{`-- Curvature potential for ISW effect
+curvaturePotential :: Double -> Double
+curvaturePotential z =
+  let h = sqrt (hubbleSq z)
+      a = 1 / (1 + z)
+  in 1 / (h * a * a)
+
+-- Numerical derivative of curvature potential
+curvaturePotentialDot :: Double -> Double
+curvaturePotentialDot z =
+  let (res, _) = derivCentral 1e-6 curvaturePotential z
+  in res`}
+                        </pre>
+                      </div>
+
+                      {/* Biological Aging Section */}
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2 font-mono">Biological Aging Model</h4>
+                        <pre className="text-sm font-mono">
+{`-- Anti-gravity curvature trace over time (for aging)
+traceAGDEFAging :: Double -> Double
+traceAGDEFAging t = 0.7 + 0.2 * sin (0.1 * t) -- mimics biological environment shifts
+
+-- Biological entropy rate (sigma)
+entropyRate :: Double -> Double
+entropyRate t = 0.01 + 0.005 * cos (0.05 * t) -- daily biological stress
+
+-- Total aging accumulation (integrated)
+agingIntegral :: [Double] -> [Double]
+agingIntegral times = scanl (+) 0 $ zipWith (*) (map traceAGDEFAging times) (map entropyRate times)`}
+                        </pre>
+                      </div>
+
+                      {/* Main Execution Section */}
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2 font-mono">Main Execution</h4>
+                        <pre className="text-sm font-mono">
+{`main :: IO ()
 main = do
+  -- First compute anti-gravity tensor eigenvalues
   let k = 1.0
       ag5 = antiGravityTensor5D k stressTensor5D
       ag4 = projectAntiGravity ag5
       (eigvals, _) = eig ag4
   putStrLn "Projected 4D Anti-Gravity Tensor Eigenvalues:"
-  print $ toList eigvals`}
-                      </pre>
+  print $ toList eigvals
+  
+  -- Compute luminosity distances and distance moduli
+  let zVals = [0.01, 0.02 .. 2.0]
+      muVals = map distanceModulus zVals
+  putStrLn "\nLuminosity Distance Moduli:"
+  putStrLn "z,mu(z)"
+  mapM_ (\\(z, mu) -> putStrLn $ show z ++ "," ++ show mu) (zip zVals muVals)
+  
+  -- Compute ISW effect for Planck comparison
+  let iswZVals = [0.0, 0.1 .. 1.0]
+      iswVals = map curvaturePotentialDot iswZVals
+  putStrLn "\nISW Effect (Φ̇(z)) for Planck Comparison:"
+  putStrLn "z,Φ̇(z)"
+  mapM_ (\\(z, isw) -> putStrLn $ show z ++ "," ++ show isw) (zip iswZVals iswVals)
+  
+  -- Finally compute aging curve
+  let times = [0,0.1..100] -- 100 time units (days, years, etc.)
+      aging = agingIntegral times
+  putStrLn "\nBiological Aging Simulation:"
+  putStrLn "Time\tBiological Age"
+  mapM_ (\\(t,a) -> putStrLn $ show t ++ "\t" ++ show a) (zip times aging)`}
+                        </pre>
+                      </div>
                     </div>
+
                     <p className="mt-4">
                       This implementation models:
                     </p>
@@ -528,20 +634,79 @@ main = do
                       <li>
                         Eigenvalue analysis of the projected tensor to determine repulsive behavior
                       </li>
+                      <li>
+                        Precise luminosity distance calculation using numerical integration
+                      </li>
+                      <li>
+                        ISW effect calculation for comparison with Planck CMB data
+                      </li>
+                      <li>
+                        Biological aging as a function of local anti-gravity curvature
+                      </li>
                     </ul>
-                    <p className="mt-4">
-                      The projection operation <InlineMath math="A_{\mu\nu} = P^\top A_{MN} P" /> is implemented 
-                      using matrix multiplication, where <InlineMath math="P" /> is the projection matrix that 
-                      drops the fifth dimension. The resulting 4D tensor's eigenvalues determine the strength 
-                      and direction of the anti-gravity effect.
-                    </p>
-                    <div className="mt-4 bg-zinc-900/50 p-4 rounded-md">
-                      <h4 className="text-dark-pink mb-2">Output Analysis</h4>
-                      <p className="text-sm">
-                        The program computes and displays the eigenvalues of the projected 4D anti-gravity tensor. 
-                        Negative eigenvalues indicate repulsive behavior along corresponding eigendirections, 
-                        which manifests as dark energy in our observable universe.
-                      </p>
+
+                    {/* Mathematical Explanations */}
+                    <div className="space-y-6 mt-6">
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2">Tensor Projection</h4>
+                        <p className="text-sm">
+                          The projection operation <InlineMath math="A_{\mu\nu} = P^\top A_{MN} P" /> is implemented 
+                          using matrix multiplication, where <InlineMath math="P" /> is the projection matrix that 
+                          drops the fifth dimension. The resulting 4D tensor's eigenvalues determine the strength 
+                          and direction of the anti-gravity effect.
+                        </p>
+                      </div>
+
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2">Cosmic Evolution</h4>
+                        <p className="text-sm">
+                          The Hubble parameter and luminosity distance are computed using numerical integration:
+                        </p>
+                        <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center mt-2">
+                          <DisplayMath math="H^2(z) = \frac{8\pi G}{3}(\rho_m + \rho_{\text{AGDEF}}(z))" />
+                        </div>
+                        <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center mt-2">
+                          <DisplayMath math="d_L(z) = (1+z)\int_0^z \frac{dz'}{H(z')}" />
+                        </div>
+                        <p className="text-sm mt-2">
+                          Where <InlineMath math="\rho_{\text{AGDEF}}(z)" /> evolves with redshift according to 
+                          the trace of the projected anti-gravity tensor.
+                        </p>
+                      </div>
+
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2">ISW Effect</h4>
+                        <p className="text-sm">
+                          The Integrated Sachs-Wolfe effect is computed through the time derivative of the 
+                          curvature potential:
+                        </p>
+                        <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center mt-2">
+                          <DisplayMath math="\Phi(z) = \frac{1}{H(z)a^2(z)}" />
+                        </div>
+                        <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center mt-2">
+                          <DisplayMath math="\dot{\Phi}(z) = \frac{d}{dz}\left(\frac{1}{H(z)a^2(z)}\right)" />
+                        </div>
+                        <p className="text-sm mt-2">
+                          This predicts enhanced ISW signal at large angles (<InlineMath math="\ell < 30" />) 
+                          in the CMB power spectrum, which can be compared with Planck observations.
+                        </p>
+                      </div>
+
+                      <div className="bg-zinc-900/50 p-4 rounded-md">
+                        <h4 className="text-dark-pink mb-2">Biological Aging</h4>
+                        <p className="text-sm">
+                          The aging model integrates the product of local anti-gravity curvature and biological 
+                          entropy rate:
+                        </p>
+                        <div className="bg-zinc-900/50 p-4 rounded-md overflow-x-auto text-center mt-2">
+                          <DisplayMath math="S(t) = \int_0^t \text{Tr}(A_{\mu\nu}(t')) \cdot \sigma(t') dt'" />
+                        </div>
+                        <p className="text-sm mt-2">
+                          Where <InlineMath math="\text{Tr}(A_{\mu\nu}(t))" /> represents the local anti-gravity 
+                          field strength and <InlineMath math="\sigma(t)" /> is the intrinsic biological entropy 
+                          production rate.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -882,6 +1047,10 @@ main = do
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="cmb" className="space-y-4">
+            <CMBComparison />
           </TabsContent>
         </Tabs>
       </div>

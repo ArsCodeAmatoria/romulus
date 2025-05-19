@@ -10,6 +10,7 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  LogarithmicScale,
   PointElement,
   LineElement,
   Title,
@@ -20,6 +21,7 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  LogarithmicScale,
   PointElement,
   LineElement,
   Title,
@@ -108,6 +110,13 @@ export function CMBComparison() {
       title: {
         display: true,
         text: "CMB Power Spectrum Comparison",
+      },
+      tooltip: {
+        backgroundColor: "#18181b",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        borderColor: "#a21caf",
+        borderWidth: 1,
       },
     },
     scales: {

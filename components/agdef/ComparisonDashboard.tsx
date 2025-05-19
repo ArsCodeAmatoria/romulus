@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -186,8 +186,8 @@ export function ComparisonDashboard() {
     },
   };
 
-  // Prepare CMB chart data
-  const cmbChartData = {
+  // Prepare CMB chart data (useMemo to ensure reactivity)
+  const cmbChartData = useMemo(() => ({
     datasets: [
       {
         label: 'Planck Data',
@@ -216,7 +216,7 @@ export function ComparisonDashboard() {
         showLine: true,
       }] : []),
     ],
-  };
+  }), [planckData, showLCDM, showAGDEF, params]);
 
   // CMB chart options
   const cmbChartOptions = {

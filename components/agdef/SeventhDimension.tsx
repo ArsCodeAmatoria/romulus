@@ -205,14 +205,17 @@ const ConfigurationSpaceVisualizer: React.FC<ConfigurationSpaceProps> = ({
         const lineGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
         
         return (
-          <line key={`line-${i}`} geometry={lineGeometry}>
-            <lineBasicMaterial 
-              color={`hsl(${(i * 30) % 360}, 80%, 70%)`} 
-              opacity={0.3 * pathVisibility}
-              transparent={true}
-              linewidth={1}
-            />
-          </line>
+          <mesh key={`line-${i}`}>
+            <primitive object={new THREE.Line(
+              lineGeometry,
+              new THREE.LineBasicMaterial({
+                color: new THREE.Color(`hsl(${(i * 30) % 360}, 80%, 70%)`),
+                opacity: 0.3 * pathVisibility,
+                transparent: true,
+                linewidth: 1
+              })
+            )} />
+          </mesh>
         );
       })}
     </group>

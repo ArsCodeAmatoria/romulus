@@ -7,6 +7,7 @@ import { SimulationPlots } from "@/components/agdef/SimulationPlots";
 import { ObservationPlots } from "@/components/agdef/ObservationPlots";
 import { ComparisonDashboard } from "@/components/agdef/ComparisonDashboard";
 import { CMBComparison } from "@/components/agdef/CMBComparison"
+import { SixthDimension } from "@/components/agdef/SixthDimension";
 
 export default function AGDEFPage() {
   return (
@@ -29,6 +30,7 @@ export default function AGDEFPage() {
             <TabsTrigger value="observations" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Observations</TabsTrigger>
             <TabsTrigger value="aging" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Aging Theory</TabsTrigger>
             <TabsTrigger value="cmb" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">CMB Comparison</TabsTrigger>
+            <TabsTrigger value="sixth-dimension" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">6th Dimension</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="mt-6">
@@ -1051,6 +1053,10 @@ main = do
 
           <TabsContent value="cmb" className="space-y-4">
             <CMBComparison />
+          </TabsContent>
+
+          <TabsContent value="sixth-dimension" className="mt-6">
+            <SixthDimension />
           </TabsContent>
         </Tabs>
       </div>

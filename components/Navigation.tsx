@@ -32,7 +32,7 @@ export default function Navigation() {
             </NavigationMenuItem>
             
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={`${pathname.startsWith('/docs') || pathname === '/agdef' ? 'text-dark-pink' : 'text-white'}`}>
+              <NavigationMenuTrigger className={`${pathname.startsWith('/docs') || pathname === '/agdef' || pathname === '/seventh-dimension' ? 'text-dark-pink' : 'text-white'}`}>
                 Theories
               </NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -100,6 +100,20 @@ export default function Navigation() {
                       <div className="text-sm font-medium leading-none">Quantum Gravity</div>
                       <p className="line-clamp-2 text-sm leading-snug text-white/70">
                         Holographic principle and quantum approaches to gravity
+                      </p>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link 
+                      href="/seventh-dimension"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-dark-pink/10 hover:text-dark-pink"
+                    >
+                      <div className="text-sm font-medium leading-none flex items-center">
+                        7th Dimension
+                        <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-dark-pink/20 rounded text-dark-pink">New</span>
+                      </div>
+                      <p className="line-clamp-2 text-sm leading-snug text-white/70">
+                        Meta-curvature and the configuration space of all possible universes
                       </p>
                     </Link>
                   </li>

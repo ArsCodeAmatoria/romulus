@@ -9,6 +9,7 @@ import { ObservationPlots } from "@/components/agdef/ObservationPlots";
 import { ComparisonDashboard } from "@/components/agdef/ComparisonDashboard";
 import { CMBComparison } from "@/components/agdef/CMBComparison";
 import { SixthDimension } from "@/components/agdef/SixthDimension";
+import { SeventhDimension } from "@/components/agdef/SeventhDimension";
 import { ChevronDown } from "lucide-react";
 
 // Define types for our tab structure
@@ -38,7 +39,8 @@ export default function AGDEFPage() {
     { id: "observations", label: "Observations", group: "Data & Analysis" },
     { id: "aging", label: "Aging Theory", group: "Applications" },
     { id: "cmb", label: "CMB Comparison", group: "Comparisons" },
-    { id: "sixth-dimension", label: "6th Dimension", group: "Advanced Topics", highlight: true }
+    { id: "sixth-dimension", label: "6th Dimension", group: "Advanced Topics", highlight: true },
+    { id: "seventh-dimension", label: "7th Dimension", group: "Advanced Topics", highlight: true }
   ];
   
   // Group tabs by their category
@@ -70,7 +72,7 @@ export default function AGDEFPage() {
           >
             <span className="flex items-center">
               <span className="mr-2">Section:</span> 
-              <span className={activeTab === "sixth-dimension" ? "text-dark-pink font-medium" : ""}>{activeTabLabel}</span>
+              <span className={activeTab === "sixth-dimension" || activeTab === "seventh-dimension" ? "text-dark-pink font-medium" : ""}>{activeTabLabel}</span>
             </span>
             <ChevronDown className={`transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
           </div>
@@ -1126,6 +1128,10 @@ main = do
 
           <TabsContent value="sixth-dimension" className="mt-6">
             <SixthDimension />
+          </TabsContent>
+          
+          <TabsContent value="seventh-dimension" className="mt-6">
+            <SeventhDimension />
           </TabsContent>
         </Tabs>
       </div>

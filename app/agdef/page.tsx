@@ -25,7 +25,7 @@ interface GroupedTabs {
 }
 
 export default function AGDEFPage() {
-  const [activeTab, setActiveTab] = useState("sixth-dimension");
+  const [activeTab, setActiveTab] = useState("overview");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const tabs: TabItem[] = [

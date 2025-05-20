@@ -19,7 +19,7 @@ export default function AGDEFPage() {
           manifesting as a projection of extrinsic curvature from a higher-dimensional matrix field into our 3D+1 spacetime.
         </p>
         
-        <Tabs defaultValue="overview" className="mb-10">
+        <Tabs defaultValue="sixth-dimension" className="mb-10">
           <TabsList className="bg-black border border-dark-pink/20">
             <TabsTrigger value="overview" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Overview</TabsTrigger>
             <TabsTrigger value="postulates" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Postulates</TabsTrigger>
@@ -30,7 +30,7 @@ export default function AGDEFPage() {
             <TabsTrigger value="observations" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Observations</TabsTrigger>
             <TabsTrigger value="aging" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Aging Theory</TabsTrigger>
             <TabsTrigger value="cmb" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">CMB Comparison</TabsTrigger>
-            <TabsTrigger value="sixth-dimension" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">6th Dimension</TabsTrigger>
+            <TabsTrigger value="sixth-dimension" className="data-[state=active]:bg-dark-pink data-[state=active]:text-white border-2 border-dark-pink/40">6th Dimension</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="mt-6">

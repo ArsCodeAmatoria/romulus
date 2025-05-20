@@ -1,15 +1,58 @@
 'use client';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from 'react';
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DisplayMath, InlineMath } from "@/components/ui/math";
 import { SimulationPlots } from "@/components/agdef/SimulationPlots";
 import { ObservationPlots } from "@/components/agdef/ObservationPlots";
 import { ComparisonDashboard } from "@/components/agdef/ComparisonDashboard";
-import { CMBComparison } from "@/components/agdef/CMBComparison"
+import { CMBComparison } from "@/components/agdef/CMBComparison";
 import { SixthDimension } from "@/components/agdef/SixthDimension";
+import { ChevronDown } from "lucide-react";
+
+// Define types for our tab structure
+interface TabItem {
+  id: string;
+  label: string;
+  group: string;
+  highlight?: boolean;
+}
+
+// Define the type for our grouped tabs object
+interface GroupedTabs {
+  [key: string]: TabItem[];
+}
 
 export default function AGDEFPage() {
+  const [activeTab, setActiveTab] = useState("sixth-dimension");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  const tabs: TabItem[] = [
+    { id: "overview", label: "Overview", group: "Core Theory" },
+    { id: "postulates", label: "Postulates", group: "Core Theory" },
+    { id: "equations", label: "Key Equations", group: "Core Theory" },
+    { id: "comparison", label: "vs ΛCDM", group: "Comparisons" },
+    { id: "implications", label: "Implications", group: "Implications" },
+    { id: "simulation", label: "Simulation", group: "Data & Analysis" },
+    { id: "observations", label: "Observations", group: "Data & Analysis" },
+    { id: "aging", label: "Aging Theory", group: "Applications" },
+    { id: "cmb", label: "CMB Comparison", group: "Comparisons" },
+    { id: "sixth-dimension", label: "6th Dimension", group: "Advanced Topics", highlight: true }
+  ];
+  
+  // Group tabs by their category
+  const groupedTabs: GroupedTabs = tabs.reduce((acc: GroupedTabs, tab: TabItem) => {
+    if (!acc[tab.group]) {
+      acc[tab.group] = [];
+    }
+    acc[tab.group].push(tab);
+    return acc;
+  }, {});
+  
+  // Get the label of the current active tab
+  const activeTabLabel = tabs.find(tab => tab.id === activeTab)?.label;
+  
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-4xl">
@@ -19,20 +62,46 @@ export default function AGDEFPage() {
           manifesting as a projection of extrinsic curvature from a higher-dimensional matrix field into our 3D+1 spacetime.
         </p>
         
-        <Tabs defaultValue="sixth-dimension" className="mb-10">
-          <TabsList className="bg-black border border-dark-pink/20">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Overview</TabsTrigger>
-            <TabsTrigger value="postulates" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Postulates</TabsTrigger>
-            <TabsTrigger value="equations" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Key Equations</TabsTrigger>
-            <TabsTrigger value="comparison" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">vs ΛCDM</TabsTrigger>
-            <TabsTrigger value="implications" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Implications</TabsTrigger>
-            <TabsTrigger value="simulation" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Simulation</TabsTrigger>
-            <TabsTrigger value="observations" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Observations</TabsTrigger>
-            <TabsTrigger value="aging" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">Aging Theory</TabsTrigger>
-            <TabsTrigger value="cmb" className="data-[state=active]:bg-dark-pink/20 data-[state=active]:text-dark-pink">CMB Comparison</TabsTrigger>
-            <TabsTrigger value="sixth-dimension" className="data-[state=active]:bg-dark-pink data-[state=active]:text-white border-2 border-dark-pink/40">6th Dimension</TabsTrigger>
-          </TabsList>
+        {/* Custom dropdown tab selector */}
+        <div className="relative mb-10">
+          <div 
+            className="cursor-pointer flex justify-between items-center bg-black border border-dark-pink/20 text-white px-4 py-2 rounded-md"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <span className="flex items-center">
+              <span className="mr-2">Section:</span> 
+              <span className={activeTab === "sixth-dimension" ? "text-dark-pink font-medium" : ""}>{activeTabLabel}</span>
+            </span>
+            <ChevronDown className={`transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
+          </div>
           
+          {isMenuOpen && (
+            <div className="absolute left-0 right-0 z-50 mt-2 bg-black border border-dark-pink/20 rounded-md shadow-lg overflow-hidden">
+              {Object.keys(groupedTabs).map(group => (
+                <div key={group}>
+                  <div className="bg-zinc-900 px-4 py-2 text-white/70 text-sm font-medium">{group}</div>
+                  {groupedTabs[group].map(tab => (
+                    <div
+                      key={tab.id}
+                      className={`px-4 py-2 cursor-pointer ${activeTab === tab.id 
+                        ? 'bg-dark-pink/20 text-dark-pink' 
+                        : 'text-white/80 hover:bg-zinc-800'}
+                        ${tab.highlight ? 'border-l-2 border-dark-pink' : ''}`}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      {tab.label}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        <Tabs value={activeTab} className="mb-10">
           <TabsContent value="overview" className="mt-6">
             <Card className="bg-black border-dark-pink/20">
               <CardHeader>

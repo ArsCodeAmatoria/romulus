@@ -391,7 +391,7 @@ export function UnifiedConsciousness() {
 
           {/* Summary Section */}
           <div>
-            <h3 className="text-lg font-medium text-dark-pink mb-2">🔁 Summary</h3>
+            <h3 className="text-lg font-medium text-dark-pink mb-2">Summary</h3>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>

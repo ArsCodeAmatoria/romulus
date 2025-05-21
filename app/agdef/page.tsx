@@ -11,6 +11,7 @@ import { CMBComparison } from "@/components/agdef/CMBComparison";
 import { SixthDimension } from "@/components/agdef/SixthDimension";
 import { SeventhDimension } from "@/components/agdef/SeventhDimension";
 import { UnifiedConsciousness } from "@/components/agdef/UnifiedConsciousness";
+import { UnifiedPhysicsConsciousness } from "@/components/agdef/UnifiedPhysicsConsciousness";
 import { ChevronDown } from "lucide-react";
 
 // Define types for our tab structure
@@ -42,7 +43,8 @@ export default function AGDEFPage() {
     { id: "cmb", label: "CMB Comparison", group: "Comparisons" },
     { id: "sixth-dimension", label: "6th Dimension", group: "Advanced Topics", highlight: true },
     { id: "seventh-dimension", label: "7th Dimension", group: "Advanced Topics", highlight: true },
-    { id: "unified-consciousness", label: "Unified Consciousness", group: "Philosophy", highlight: true }
+    { id: "unified-consciousness", label: "Unified Consciousness", group: "Philosophy", highlight: true },
+    { id: "unified-physics-consciousness", label: "Unified Physics & Consciousness", group: "Philosophy", highlight: true }
   ];
   
   // Group tabs by their category
@@ -1138,6 +1140,10 @@ main = do
           
           <TabsContent value="unified-consciousness" className="mt-6">
             <UnifiedConsciousness />
+          </TabsContent>
+          
+          <TabsContent value="unified-physics-consciousness" className="mt-6">
+            <UnifiedPhysicsConsciousness />
           </TabsContent>
         </Tabs>
       </div>

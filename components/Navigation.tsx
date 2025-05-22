@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Github } from 'lucide-react';
+import { Wheat } from 'lucide-react';
 
 import {
   NavigationMenu,
@@ -16,6 +16,7 @@ import {
 
 export default function Navigation() {
   const pathname = usePathname();
+  console.log("Current pathname:", pathname);
   
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-dark-pink/20">
@@ -170,15 +171,13 @@ export default function Navigation() {
           </NavigationMenuList>
         </NavigationMenu>
         
-        <a 
-          href="https://github.com/ArsCodeAmatoria/romulus" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-white hover:text-dark-pink transition-colors"
-          aria-label="View source on GitHub"
+        <Link 
+          href="/dream-consciousness"
+          className={`text-white hover:text-dark-pink transition-colors ${pathname === '/dream-consciousness' ? 'text-dark-pink' : 'text-white'}`}
+          aria-label="Dream Consciousness Theory"
         >
-          <Github size={24} />
-        </a>
+          <Wheat size={24} />
+        </Link>
       </div>
     </div>
   );

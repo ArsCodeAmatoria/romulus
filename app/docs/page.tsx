@@ -10,7 +10,8 @@ import {
   Atom, 
   Sparkles,
   Waves,
-  Zap
+  Zap,
+  Wheat
 } from 'lucide-react';
 
 const theories = [
@@ -55,6 +56,12 @@ const theories = [
     description: "Approaches to gravity from quantum mechanics and the holographic principle",
     link: "/docs/quantum-gravity",
     icon: <Sparkles className="text-dark-pink" size={28} />
+  },
+  {
+    title: "Dream Consciousness Theory",
+    description: "Exploring consciousness as a fractal field across higher dimensions, with dream characters as conscious agents",
+    link: "/dream-consciousness",
+    icon: <Wheat className="text-dark-pink" size={28} />
   }
 ];
 
@@ -81,7 +88,7 @@ export default function DocsPage() {
           <h1 className="text-4xl font-bold mb-6 text-white neon-glow">Theory Explorer</h1>
           <p className="text-white/80 text-lg">
             Explore different theoretical frameworks that propose modifications to
-            gravity as an alternative to dark matter.
+            gravity as an alternative to dark matter, as well as explorations of consciousness.
           </p>
         </div>
         

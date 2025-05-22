@@ -1,6 +1,6 @@
 # Romulus – Dark Matter Science
 
-A modern, futuristic science site focused on exploring Dark Matter through Modified Gravity theories.
+A modern, futuristic science site focused on exploring Dark Matter through Modified Gravity theories and consciousness theories.
 
 <div align="center">
   <img src="https://github.com/ArsCodeAmatoria/romulus/raw/main/public/images/romulusIX.png" alt="Romulus Concept Art" width="600" />
@@ -33,6 +33,7 @@ This approach could explain why direct detection experiments have consistently f
 - Scalar Field / f(R) Gravity
 - Quantum Gravity + Holographic Principle
 - Dark Matter as Boundary Condition
+- Dream Consciousness Theory (accessible via the wheat icon in the navigation)
 
 ## Tech Stack
 
@@ -63,6 +64,10 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Hidden Features
+
+The site contains a special page dedicated to the Dream Consciousness Theory, which explores consciousness as a fractal field across higher dimensions. To access it, click on the wheat icon (🌾) in the top navigation.
 
 ## License
 

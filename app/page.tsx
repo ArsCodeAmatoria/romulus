@@ -43,65 +43,6 @@ export default function Home() {
         </div>
       </main>
       
-      {/* Dimensional Explorations Section */}
-      <section className="relative z-10 bg-black/80 backdrop-blur-sm py-16 border-t border-dark-pink/20">
-        <div className="container px-4">
-          <h2 className="text-3xl font-bold text-white mb-6">Higher Dimensional Consciousness</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-black/40 p-6 rounded-lg border border-dark-pink/30 hover:bg-black/60 transition-colors">
-              <h3 className="text-xl font-semibold text-dark-pink mb-4">Dream Traversal</h3>
-              <p className="text-white/80 mb-6">
-                Visualize and interact with a simulation of consciousness as it traverses 
-                through dreams across 6D-8D space.
-              </p>
-              <Button 
-                variant="outline" 
-                className="border-dark-pink text-dark-pink hover:bg-dark-pink/20 neon-border"
-                asChild
-              >
-                <Link href="/dream-traversal">
-                  Open Simulator
-                </Link>
-              </Button>
-            </div>
-            
-            <div className="bg-black/40 p-6 rounded-lg border border-dark-pink/30 hover:bg-black/60 transition-colors">
-              <h3 className="text-xl font-semibold text-dark-pink mb-4">The 8th Dimension</h3>
-              <p className="text-white/80 mb-6">
-                Explore the field of all possible consciousnesses—a space where every 
-                possible way of being aware exists as a mathematical structure.
-              </p>
-              <Button 
-                variant="outline" 
-                className="border-dark-pink text-dark-pink hover:bg-dark-pink/20 neon-border"
-                asChild
-              >
-                <Link href="/eighth-dimension">
-                  Learn More
-                </Link>
-              </Button>
-            </div>
-            
-            <div className="bg-black/40 p-6 rounded-lg border border-dark-pink/30 hover:bg-black/60 transition-colors">
-              <h3 className="text-xl font-semibold text-dark-pink mb-4">The 9th Dimension</h3>
-              <p className="text-white/80 mb-6">
-                Discover the meta-law field—the space of all possible rules and constraint 
-                systems that give rise to consciousness itself.
-              </p>
-              <Button 
-                variant="outline" 
-                className="border-dark-pink text-dark-pink hover:bg-dark-pink/20 neon-border"
-                asChild
-              >
-                <Link href="/ninth-dimension">
-                  Learn More
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-      
       {/* About Section Preview */}
       <section id="about-preview" className="relative z-10 bg-black/80 backdrop-blur-sm py-16">
         <div className="container px-4">

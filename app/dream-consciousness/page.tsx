@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Zap } from 'lucide-react';
 
 export default function DreamConsciousness() {
   return (
@@ -214,6 +214,21 @@ export default function DreamConsciousness() {
         
         <div className="text-center text-white/50 italic mt-16 mb-8">
           This is a hidden page. Welcome to the depths of consciousness exploration.
+        </div>
+        
+        <div className="mt-16 mb-8 p-6 bg-black/30 rounded-lg border border-dark-pink/30 not-prose">
+          <h3 className="text-xl font-bold text-white mb-4">Interactive Exploration</h3>
+          <p className="text-white/80 mb-6">
+            Ready to explore these concepts in an interactive way? Try our Conscious Field Simulator
+            where you can visualize consciousness as quantum ψ-particles representing sub-personalities.
+          </p>
+          <Link
+            href="/conscious-field-simulator"
+            className="inline-flex items-center px-4 py-2 rounded bg-dark-pink/20 hover:bg-dark-pink/30 text-dark-pink transition-colors"
+          >
+            <Zap size={16} className="mr-2" />
+            Launch Conscious Field Simulator
+          </Link>
         </div>
       </article>
     </main>

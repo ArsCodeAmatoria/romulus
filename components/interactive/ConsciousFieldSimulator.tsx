@@ -148,11 +148,9 @@ function ParticleConnections({ particles, entanglementThreshold }: ParticleConne
         return (
           <line key={conn.key}>
             <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position" 
-                array={vertices}
-                count={2}
-                itemSize={3}
+              <bufferAttribute 
+                attach="attributes-position"
+                args={[vertices, 3]}
               />
             </bufferGeometry>
             <lineBasicMaterial

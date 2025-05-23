@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Popsicle } from 'lucide-react';
+import { Leaf } from 'lucide-react';
 
 import {
   NavigationMenu,
@@ -230,6 +230,19 @@ export default function Navigation() {
                       </p>
                     </Link>
                   </li>
+                  <li>
+                    <Link 
+                      href="/dream-consciousness"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-dark-pink/10 hover:text-dark-pink"
+                    >
+                      <div className="text-sm font-medium leading-none flex items-center">
+                        Dream Consciousness
+                      </div>
+                      <p className="line-clamp-2 text-sm leading-snug text-white/70">
+                        Explorations of dreams and consciousness
+                      </p>
+                    </Link>
+                  </li>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
@@ -256,11 +269,13 @@ export default function Navigation() {
         </NavigationMenu>
         
         <Link 
-          href="/dream-consciousness"
-          className={`text-white hover:text-dark-pink transition-colors ${pathname === '/dream-consciousness' ? 'text-dark-pink' : 'text-white'}`}
-          aria-label="Dream Consciousness Theory"
+          href="https://arcana-obscura.vercel.app/"
+          className="text-white hover:text-dark-pink transition-colors"
+          aria-label="Arcana Obscura"
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          <Popsicle size={24} />
+          <Leaf size={24} />
         </Link>
       </div>
     </div>

@@ -94,40 +94,42 @@ const DreamParticleField = ({
   const colors: number[] = [];
   const color = new THREE.Color();
   
-  // Create particles based on identity vector
+  // Create particles based on identity vector - with strict containment
   for (let i = 0; i < identityDimension; i++) {
     const angle = (i / identityDimension) * Math.PI * 2;
     
-    // Constrain radius within bounding sphere
-    const radius = Math.min(
-      boundingRadius * 0.8, 
-      3.0 * (0.5 + dreamState.identity[i] * identityScale)
-    );
+    // Strict containment - normalize all values to fixed range
+    // Ensure radius never exceeds bounding sphere
+    const normalizedValue = Math.max(-0.8, Math.min(0.8, dreamState.identity[i]));
+    const radius = boundingRadius * (0.3 + Math.abs(normalizedValue) * 0.3);
     
+    // Add position with strict limits
     vertices.push(
       Math.cos(angle) * radius,
       Math.sin(angle) * radius,
-      Math.min(boundingRadius * 0.7, dreamState.identity[i] * 2 * identityScale)
+      // Z-axis is strictly limited
+      normalizedValue * boundingRadius * 0.3
     );
     
     // Color based on conscious field - blend between blue and pink
+    const consciousValue = Math.max(-0.8, Math.min(0.8, dreamState.conscious[i % consciousDimension]));
     color.setRGB(
-      0.8 + dreamState.conscious[i % consciousDimension] * 0.2,
-      0.2 + dreamState.conscious[i % consciousDimension] * 0.3,
-      0.8 - dreamState.conscious[i % consciousDimension] * 0.2
+      0.6 + consciousValue * 0.2,
+      0.2 + consciousValue * 0.3,
+      0.6 - consciousValue * 0.2
     );
     colors.push(color.r, color.g, color.b);
   }
   
-  // Create entanglement connections (limited number for performance)
+  // Create entanglement connections - strictly limited
   const entanglementPoints: number[] = [];
-  const maxConnections = 50; // Limit total connections for performance
+  const maxConnections = 30; // Further reduced for stability
   let connectionCount = 0;
   
-  for (let i = 0; i < dreamState.entanglement.length; i++) {
-    for (let j = i + 1; j < dreamState.entanglement[i].length; j++) {
+  for (let i = 0; i < dreamState.entanglement.length && connectionCount < maxConnections; i++) {
+    for (let j = i + 1; j < dreamState.entanglement[i].length && connectionCount < maxConnections; j++) {
       const strength = Math.abs(dreamState.entanglement[i][j]);
-      if (strength > 0.2 && connectionCount < maxConnections) { // Higher threshold and limited count
+      if (strength > 0.3) { // Higher threshold to show fewer connections
         // Get corresponding vertices for both points
         const idxI = i % (vertices.length / 3);
         const idxJ = j % (vertices.length / 3);
@@ -172,12 +174,12 @@ const DreamParticleField = ({
     }
   }, [dreamState, vertices, colors, entanglementPoints]);
   
-  // Animate particles with controlled rotation
+  // Animate particles with VERY controlled rotation
   useFrame((state, delta) => {
     if (particlesRef.current && isPlaying) {
-      // Limit rotation speed
-      particlesRef.current.rotation.y += delta * 0.05;
-      particlesRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
+      // Even slower rotation
+      particlesRef.current.rotation.y += delta * 0.025; 
+      particlesRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.05) * 0.05;
       
       // Reset rotation after full circle to prevent numerical drift
       if (particlesRef.current.rotation.y > Math.PI * 2) {
@@ -196,7 +198,7 @@ const DreamParticleField = ({
       <points ref={particlesRef}>
         <bufferGeometry />
         <pointsMaterial 
-          size={0.4} 
+          size={0.3} 
           sizeAttenuation={true} 
           vertexColors={true}
           transparent
@@ -209,14 +211,14 @@ const DreamParticleField = ({
         <bufferGeometry />
         <lineBasicMaterial 
           color="#ff00ff" 
-          opacity={0.2} 
+          opacity={0.15} 
           transparent
           linewidth={1}
         />
       </lineSegments>
       
-      {/* Bounding sphere (invisible) */}
-      <mesh ref={boundingBoxRef} visible={false}>
+      {/* Visible bounding sphere to show limits */}
+      <mesh ref={boundingBoxRef} visible={true}>
         <sphereGeometry args={[boundingRadius, 16, 16]} />
         <meshBasicMaterial color="#ffffff" wireframe opacity={0.05} transparent />
       </mesh>
@@ -224,46 +226,58 @@ const DreamParticleField = ({
   );
 };
 
-// Function to simulate dream step
+// Function to simulate dream step with strong containment
 const simulateDreamStep = (
   current: DreamState, 
   instability: number = 0.05, 
   lucidity: number = 0.2
 ) => {
-  // Simulate entanglement matrix changes
+  // Reduced instability for matrices
   const dEntanglement = randomMatrix(
     current.entanglement.length, 
     current.entanglement[0].length, 
-    instability * 0.5 // Reduced for stability
+    instability * 0.25 // Greatly reduced for stability
   );
   
-  // Simulate identity vector changes
-  const dIdentity = randomVector(current.identity.length, instability * 0.7); // Reduced for stability
+  // Even smaller changes for identity
+  const dIdentity = randomVector(current.identity.length, instability * 0.3);
   
-  // Simulate conscious field changes
-  const dConscious = randomVector(current.conscious.length, instability);
+  // Smaller changes for conscious field
+  const dConscious = randomVector(current.conscious.length, instability * 0.5);
   
   // Apply lucidity factor (reduces rate of identity change)
   const lucidityFactor = 1.0 - lucidity;
   
-  // Calculate new state
+  // Pull-to-center force (prevents values from drifting too far)
+  const centeringForce = 0.01;
+  
+  // Calculate new state with containment forces
   const newState = {
     entanglement: current.entanglement.map((row, i) => 
       row.map((val, j) => {
         // Apply random change but keep within range
-        const newVal = val + dEntanglement[i][j];
-        return Math.max(-1, Math.min(1, newVal));
+        let newVal = val + dEntanglement[i][j];
+        // Add centering force - pull values back toward 0
+        newVal = newVal - (newVal * centeringForce);
+        // Hard clamp values
+        return Math.max(-0.8, Math.min(0.8, newVal));
       })
     ),
     identity: current.identity.map((val, i) => {
-      // Apply random change with lucidity factor but keep within range
-      const newVal = val + dIdentity[i] * lucidityFactor;
-      return Math.max(-1, Math.min(1, newVal));
+      // Apply random change with lucidity factor
+      let newVal = val + dIdentity[i] * lucidityFactor;
+      // Add centering force - pull values back toward 0
+      newVal = newVal - (newVal * centeringForce);
+      // Hard clamp values
+      return Math.max(-0.8, Math.min(0.8, newVal));
     }),
     conscious: current.conscious.map((val, i) => {
-      // Apply random change but keep within range
-      const newVal = val + dConscious[i];
-      return Math.max(-1, Math.min(1, newVal));
+      // Apply random change
+      let newVal = val + dConscious[i];
+      // Add centering force - pull values back toward 0
+      newVal = newVal - (newVal * centeringForce);
+      // Hard clamp values
+      return Math.max(-0.8, Math.min(0.8, newVal));
     }),
     step: current.step + 1,
     time: current.time + 0.1
@@ -272,18 +286,18 @@ const simulateDreamStep = (
   return newState;
 };
 
-// Create initial dream state
+// Create initial dream state with moderate values
 const createInitialDreamState = (): DreamState => ({
   entanglement: [
-    [0.5, 0.2, 0.1, -0.3, 0.1, 0.4],
-    [0.2, 0.6, 0.3, 0.1, -0.2, 0.0],
-    [0.1, 0.3, 0.7, 0.2, 0.1, -0.1],
-    [-0.3, 0.1, 0.2, 0.6, 0.4, 0.2],
-    [0.1, -0.2, 0.1, 0.4, 0.5, 0.3],
-    [0.4, 0.0, -0.1, 0.2, 0.3, 0.4]
+    [0.3, 0.1, 0.1, -0.2, 0.1, 0.2],
+    [0.1, 0.3, 0.2, 0.1, -0.1, 0.0],
+    [0.1, 0.2, 0.3, 0.1, 0.1, -0.1],
+    [-0.2, 0.1, 0.1, 0.3, 0.2, 0.1],
+    [0.1, -0.1, 0.1, 0.2, 0.3, 0.2],
+    [0.2, 0.0, -0.1, 0.1, 0.2, 0.3]
   ],
-  identity: [0.5, 0.3, -0.2, 0.2, -0.4, 0.1], // Reduced values for more stability
-  conscious: [0.5, 0.6, 0.2, -0.3, 0.4, -0.1], // Reduced values for more stability
+  identity: [0.3, 0.2, -0.1, 0.2, -0.3, 0.1], // Further reduced initial values
+  conscious: [0.3, 0.5, 0.1, -0.2, 0.3, -0.1], // Further reduced initial values
   step: 0,
   time: 0
 });
@@ -292,12 +306,21 @@ const createInitialDreamState = (): DreamState => ({
 export default function DreamTraversalSimulator() {
   const [dreamState, setDreamState] = useState<DreamState>(createInitialDreamState());
   const [isPlaying, setIsPlaying] = useState(false);
-  const [instability, setInstability] = useState(0.03); // Lower default instability
-  const [lucidity, setLucidity] = useState(0.3); // Higher default lucidity
+  const [instability, setInstability] = useState(0.02); // Even lower default instability
+  const [lucidity, setLucidity] = useState(0.4); // Higher default lucidity
   const [autoEntanglement, setAutoEntanglement] = useState(true);
   const [isLucidDream, setIsLucidDream] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // More frequent auto-reset
+  useEffect(() => {
+    // Automatically reset if things get too unstable
+    if (dreamState.step > 0 && dreamState.step % 200 === 0) {
+      // More frequent reset to prevent excessive growth
+      resetDream();
+    }
+  }, [dreamState.step]);
   
   // Use memoized step function to prevent recreation on each render
   const stepDream = useCallback(() => {
@@ -341,15 +364,6 @@ export default function DreamTraversalSimulator() {
     };
   }, [isPlaying, stepDream]);
   
-  // Reset when parameters change significantly
-  useEffect(() => {
-    // Automatically reset if things get too unstable
-    if (dreamState.step > 0 && dreamState.step % 500 === 0) {
-      // Periodic reset to prevent excessive growth
-      resetDream();
-    }
-  }, [dreamState.step]);
-  
   const resetDream = () => {
     setDreamState(createInitialDreamState());
     setIsLucidDream(false);
@@ -365,40 +379,47 @@ export default function DreamTraversalSimulator() {
   };
   
   return (
-    <section>
-      <h2 className="text-3xl font-bold text-white mb-6">Dream Traversal Simulator</h2>
+    <section className="max-h-screen overflow-hidden">
+      <h2 className="text-3xl font-bold text-white mb-4">Dream Traversal Simulator</h2>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Dream visualization */}
-        <div className="lg:col-span-2 bg-black/30 p-6 rounded-lg border border-dark-pink/20 min-h-[500px] relative">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-h-[calc(100vh-180px)]">
+        {/* Dream visualization with container message */}
+        <div className="lg:col-span-2 bg-black/30 p-4 rounded-lg border border-dark-pink/20 h-[450px] max-h-[450px] relative overflow-hidden">
           <Canvas 
             shadows 
-            camera={{ position: [0, 0, 10], fov: 50 }}
+            camera={{ position: [0, 0, 10], fov: 45 }} // Narrower FOV
             gl={{ antialias: true }}
-            dpr={[1, 2]} // Optimize for performance
+            dpr={[1, 1.5]} // Even more performance optimized
           >
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} color="#ff2a6d" intensity={1} />
-            <pointLight position={[-10, -10, -10]} color="#05d9e8" intensity={0.5} />
+            <ambientLight intensity={0.4} />
+            <pointLight position={[10, 10, 10]} color="#ff2a6d" intensity={0.8} />
+            <pointLight position={[-10, -10, -10]} color="#05d9e8" intensity={0.4} />
             
             <DreamParticleField 
               dreamState={dreamState} 
               isPlaying={isPlaying} 
-              identityScale={1.5} // Reduced scale
-              consciousScale={1.0} // Reduced scale
-              boundingRadius={5.0}
+              identityScale={1.0} // Reduced scale
+              consciousScale={0.8} // Reduced scale
+              boundingRadius={4.0} // Smaller bounding radius
             />
             
             <OrbitControls 
               enablePan={true} 
               enableZoom={true} 
               enableRotate={true}
-              maxDistance={15}
-              minDistance={3}
+              maxDistance={12}
+              minDistance={5}
+              // Limit rotation to prevent disorientation
+              maxPolarAngle={Math.PI * 0.6}
+              minPolarAngle={Math.PI * 0.3}
             />
             
             {showDebug && <Stats />}
           </Canvas>
+          
+          <div className="absolute top-4 left-4 text-xs text-white/60 bg-black/30 p-2 rounded">
+            Bounded Simulation: All particles contained within sphere
+          </div>
           
           {isLucidDream && (
             <div className="absolute top-6 right-6 px-4 py-2 bg-dark-pink/20 rounded-md border border-dark-pink text-white">
@@ -406,7 +427,7 @@ export default function DreamTraversalSimulator() {
             </div>
           )}
           
-          <div className="mt-4 flex justify-between items-center">
+          <div className="mt-2 flex justify-between items-center">
             <div className="flex gap-3">
               <Button 
                 onClick={toggleDream}
@@ -426,7 +447,7 @@ export default function DreamTraversalSimulator() {
             </div>
             
             <div className="flex items-center gap-4">
-              <div className="text-white/70">
+              <div className="text-white/70 text-sm">
                 Step: {dreamState.step} | Time: {dreamState.time.toFixed(1)}s
               </div>
               
@@ -442,10 +463,10 @@ export default function DreamTraversalSimulator() {
         </div>
         
         {/* Controls and parameters */}
-        <div className="bg-black/30 p-6 rounded-lg border border-dark-pink/20">
+        <div className="bg-black/30 p-4 rounded-lg border border-dark-pink/20 h-[450px] max-h-[450px] overflow-y-auto">
           <h3 className="text-xl font-semibold text-white mb-4">Dream Parameters</h3>
           
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label>Dream Instability</Label>
@@ -453,9 +474,9 @@ export default function DreamTraversalSimulator() {
               </div>
               <Slider 
                 value={[instability]} 
-                min={0.01} 
-                max={0.1} // Lower max value for stability
-                step={0.01} 
+                min={0.005} 
+                max={0.05} // Much lower max value for stability
+                step={0.005} 
                 onValueChange={values => setInstability(values[0])}
               />
               <p className="text-white/50 text-xs mt-1">Controls rate of change in dream state</p>
@@ -486,7 +507,7 @@ export default function DreamTraversalSimulator() {
             </div>
           </div>
           
-          <div className="mt-6">
+          <div className="mt-4">
             <Tabs defaultValue="identity">
               <TabsList className="w-full">
                 <TabsTrigger value="identity" className="flex-1">Identity (7D)</TabsTrigger>
@@ -543,8 +564,8 @@ export default function DreamTraversalSimulator() {
         </div>
       </div>
       
-      <div className="mt-6 bg-black/30 p-6 rounded-lg border border-dark-pink/20">
-        <div className="flex justify-between items-center mb-4">
+      <div className="mt-4 bg-black/30 p-4 rounded-lg border border-dark-pink/20 max-h-[120px] overflow-hidden">
+        <div className="flex justify-between items-center mb-2">
           <h3 className="text-xl font-semibold text-white">Current Dream State</h3>
           {isLucidDream ? (
             <span className="text-dark-pink px-3 py-1 bg-dark-pink/10 rounded border border-dark-pink/40">
@@ -553,13 +574,13 @@ export default function DreamTraversalSimulator() {
           ) : null}
         </div>
         
-        <div className="mt-4 text-white/70 text-sm">
+        <div className="text-white/70 text-sm">
           {isLucidDream ? (
-            <p className="text-dark-pink mb-2">
+            <p className="text-dark-pink">
               Lucid Dream State: You are aware that you are dreaming and can control the dream.
             </p>
           ) : (
-            <p className="mb-2">
+            <p>
               Standard Dream State: Dream unfolds naturally with changes across all dimensions.
             </p>
           )}

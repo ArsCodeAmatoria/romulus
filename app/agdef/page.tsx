@@ -11,6 +11,7 @@ import { CMBComparison } from "@/components/agdef/CMBComparison";
 import { SixthDimension } from "@/components/agdef/SixthDimension";
 import { SeventhDimension } from "@/components/agdef/SeventhDimension";
 import { TempleOfRules } from "@/components/agdef/TempleOfRules";
+import { TempleOfSingularity } from "@/components/agdef/TempleOfSingularity";
 import { UnifiedConsciousness } from "@/components/agdef/UnifiedConsciousness";
 import { UnifiedPhysicsConsciousness } from "@/components/agdef/UnifiedPhysicsConsciousness";
 import { ChevronDown } from "lucide-react";
@@ -45,6 +46,7 @@ export default function AGDEFPage() {
     { id: "sixth-dimension", label: "6th Dimension", group: "Advanced Topics", highlight: true },
     { id: "seventh-dimension", label: "7th Dimension", group: "Advanced Topics", highlight: true },
     { id: "temple-of-rules", label: "Temple of Rules", group: "Advanced Topics", highlight: true },
+    { id: "temple-of-singularity", label: "Temple of Singularity", group: "Advanced Topics", highlight: true },
     { id: "unified-consciousness", label: "Unified Consciousness", group: "Philosophy", highlight: true },
     { id: "unified-physics-consciousness", label: "Unified Physics & Consciousness", group: "Philosophy", highlight: true }
   ];
@@ -1142,6 +1144,10 @@ main = do
           
           <TabsContent value="temple-of-rules" className="mt-6">
             <TempleOfRules />
+          </TabsContent>
+          
+          <TabsContent value="temple-of-singularity" className="mt-6">
+            <TempleOfSingularity />
           </TabsContent>
           
           <TabsContent value="unified-consciousness" className="mt-6">

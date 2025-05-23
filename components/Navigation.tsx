@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Wheat } from 'lucide-react';
+import { Popsicle } from 'lucide-react';
 
 import {
   NavigationMenu,
@@ -176,7 +176,7 @@ export default function Navigation() {
           className={`text-white hover:text-dark-pink transition-colors ${pathname === '/dream-consciousness' ? 'text-dark-pink' : 'text-white'}`}
           aria-label="Dream Consciousness Theory"
         >
-          <Wheat size={24} />
+          <Popsicle size={24} />
         </Link>
       </div>
     </div>

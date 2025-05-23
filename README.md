@@ -33,7 +33,7 @@ This approach could explain why direct detection experiments have consistently f
 - Scalar Field / f(R) Gravity
 - Quantum Gravity + Holographic Principle
 - Dark Matter as Boundary Condition
-- Dream Consciousness Theory (accessible via the wheat icon in the navigation)
+- Dream Consciousness Theory (accessible via the popsicle icon in the navigation)
 
 ## Tech Stack
 
@@ -67,7 +67,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Hidden Features
 
-The site contains a special page dedicated to the Dream Consciousness Theory, which explores consciousness as a fractal field across higher dimensions. To access it, click on the wheat icon (🌾) in the top navigation.
+The site contains a special page dedicated to the Dream Consciousness Theory, which explores consciousness as a fractal field across higher dimensions. To access it, click on the popsicle icon (🍦) in the top navigation.
 
 ## License
 

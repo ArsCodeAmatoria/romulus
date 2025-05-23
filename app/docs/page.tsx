@@ -11,7 +11,7 @@ import {
   Sparkles,
   Waves,
   Zap,
-  Wheat
+  Popsicle
 } from 'lucide-react';
 
 const theories = [
@@ -61,7 +61,7 @@ const theories = [
     title: "Dream Consciousness Theory",
     description: "Exploring consciousness as a fractal field across higher dimensions, with dream characters as conscious agents",
     link: "/dream-consciousness",
-    icon: <Wheat className="text-dark-pink" size={28} />
+    icon: <Popsicle className="text-dark-pink" size={28} />
   }
 ];
 

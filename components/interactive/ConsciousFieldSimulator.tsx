@@ -141,25 +141,29 @@ function ParticleConnections({ particles, entanglementThreshold }: ParticleConne
   
   return (
     <>
-      {connections.map(conn => (
-        <line key={conn.key}>
-          <bufferGeometry attach="geometry">
-            <bufferAttribute
-              attachObject={['attributes', 'position']}
-              array={new Float32Array([...conn.start, ...conn.end])}
-              count={2}
-              itemSize={3}
+      {connections.map(conn => {
+        // Create vertices array from start and end points
+        const vertices = new Float32Array([...conn.start, ...conn.end]);
+        
+        return (
+          <line key={conn.key}>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position" 
+                array={vertices}
+                count={2}
+                itemSize={3}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial
+              color="#ffffff"
+              opacity={conn.strength * 0.5}
+              transparent
+              linewidth={1}
             />
-          </bufferGeometry>
-          <lineBasicMaterial
-            attach="material"
-            color="#ffffff"
-            opacity={conn.strength * 0.5}
-            transparent
-            linewidth={1}
-          />
-        </line>
-      ))}
+          </line>
+        );
+      })}
     </>
   );
 }

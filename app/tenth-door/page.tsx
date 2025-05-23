@@ -278,9 +278,15 @@ export default function TenthDoorPage() {
         </motion.div>
         
         <div className="fade-section mt-32 text-center">
-          <Link href="/tenth-dimension" className="text-dark-pink/70 hover:text-dark-pink">
-            Return to the 10th Dimension
-          </Link>
+          <div className="flex flex-col items-center gap-4">
+            <Link href="/tenth-dimension" className="text-dark-pink/70 hover:text-dark-pink">
+              Return to the 10th Dimension
+            </Link>
+            <Link href="/dimension-zero" className="text-dark-pink/70 hover:text-dark-pink flex items-center gap-2">
+              <span>Step Back to Dimension 0</span>
+              <ArrowLeft size={16} />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

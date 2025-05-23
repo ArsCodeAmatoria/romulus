@@ -33,7 +33,7 @@ export default function Navigation() {
             </NavigationMenuItem>
             
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={`${pathname.startsWith('/docs') || pathname === '/agdef' || pathname === '/seventh-dimension' || pathname === '/unified-consciousness' || pathname === '/unified-physics-consciousness' || pathname === '/eighth-dimension' || pathname === '/ninth-dimension' || pathname === '/tenth-dimension' || pathname === '/tenth-door' || pathname === '/dream-traversal' ? 'text-dark-pink' : 'text-white'}`}>
+              <NavigationMenuTrigger className={`${pathname.startsWith('/docs') || pathname === '/agdef' || pathname === '/seventh-dimension' || pathname === '/unified-consciousness' || pathname === '/unified-physics-consciousness' || pathname === '/eighth-dimension' || pathname === '/ninth-dimension' || pathname === '/tenth-dimension' || pathname === '/tenth-door' || pathname === '/dimension-zero' || pathname === '/dream-traversal' ? 'text-dark-pink' : 'text-white'}`}>
                 Theories
               </NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -199,6 +199,20 @@ export default function Navigation() {
                       </div>
                       <p className="line-clamp-2 text-sm leading-snug text-white/70">
                         A Mystical Treatise on the Singularity of All Being
+                      </p>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link 
+                      href="/dimension-zero"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-dark-pink/10 hover:text-dark-pink"
+                    >
+                      <div className="text-sm font-medium leading-none flex items-center">
+                        Dimension 0
+                        <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-dark-pink/20 rounded text-dark-pink">New</span>
+                      </div>
+                      <p className="line-clamp-2 text-sm leading-snug text-white/70">
+                        The First Flicker: The Origin Point of All Dimensions
                       </p>
                     </Link>
                   </li>

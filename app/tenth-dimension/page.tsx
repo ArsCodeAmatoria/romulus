@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { DisplayMath } from "@/components/ui/math";
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TenthDimensionPage() {
@@ -539,9 +539,15 @@ export default function TenthDimensionPage() {
               animate={{ opacity: isVisible ? 1 : 0 }}
               transition={{ duration: 2, delay: 7.0 }}
             >
-              <Link href="/agdef" className="text-dark-pink/70 hover:text-dark-pink">
-                Return to AGDEF Theory
-              </Link>
+              <div className="flex flex-col items-center gap-4">
+                <Link href="/agdef" className="text-dark-pink/70 hover:text-dark-pink">
+                  Return to AGDEF Theory
+                </Link>
+                <Link href="/tenth-door" className="text-dark-pink/70 hover:text-dark-pink flex items-center gap-2">
+                  <span>Explore The 10th Door Treatise</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
             </motion.div>
           </div>
         </motion.div>

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf } from 'lucide-react';
+import { Github } from 'lucide-react';
 
 import {
   NavigationMenu,
@@ -269,13 +269,13 @@ export default function Navigation() {
         </NavigationMenu>
         
         <Link 
-          href="https://arcana-obscura.vercel.app/"
+          href="https://github.com/ArsCodeAmatoria/romulus"
           className="text-white hover:text-dark-pink transition-colors"
-          aria-label="Arcana Obscura"
+          aria-label="GitHub Repository"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Leaf size={24} />
+          <Github size={24} />
         </Link>
       </div>
     </div>

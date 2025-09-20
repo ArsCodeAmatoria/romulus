@@ -268,16 +268,11 @@ export default function Navigation() {
           </NavigationMenuList>
         </NavigationMenu>
         
-        <Link 
-          href="https://github.com/ArsCodeAmatoria/romulus"
-          className="text-white hover:text-dark-pink transition-colors"
-          aria-label="GitHub Repository"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        
+        <div className="text-white">
           <Github size={24} />
-        </Link>
+        </div>
       </div>
     </div>
   );
-} 
+}
